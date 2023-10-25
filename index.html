@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sysmod</title>
+    <script defer src="./main.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="control-panel">
+        <h1>Sysmod</h1>
+        <div>
+          <form action="./" method="POST" id="system-model-settings">
+            <p><b>Settings</b></p>
+            <label for="model-scale">Display Scale:</label>
+            <select name="scale" id="scale-select">
+              <option value="small" >Small</option>
+              <option value="medium" >Medium</option>
+              <option value="large" >Large</option>
+            </select>
+            <button name="save" type="button">Save Changes</button>
+          </form>
+        </div>
+    </div>
+    <div id="storage-container"></div>
+</body>
+</html>
