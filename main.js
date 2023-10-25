@@ -119,15 +119,11 @@ function emptyRow(col, row) {
     }
 };
 
-emptyRow(0, 3);
-
 function emptyRowsAll(x) {
     for (let i = 0; i < x.length; i++) {
         emptyRow(x[i][0], x[i][1]);
     }
 };
-
-// emptyRowsAll(emptyRows);
 
 function addBags(col, row, tray) {
     try {
@@ -155,8 +151,6 @@ function addBagsColumn(col) {
     }
 };
 
-addBagsColumn(0);
-
 function addBagsColumnsAll(cols) {
     for (let i = 0; i < cols; i++) {
         addBagsColumn(i);
@@ -182,8 +176,6 @@ function addColumnData(col) {
     display.appendChild(fullBags);
     display.appendChild(emptyBags);
 };
-
-// addColumnData(0);
 
 // System Model Settings
 const settings = document.body.querySelector('#system-model-settings');
