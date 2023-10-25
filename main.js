@@ -1,9 +1,9 @@
 // PARAMETERS
-const cols = 8;
-const rows = 14;
-const trays = 3;
-const bags = 2;
-const emptyRows = [
+let cols = 8;
+let rows = 14;
+let trays = 3;
+let bags = 2;
+let emptyRows = [
   // [column, row]
   // Col #1
   [1, 4],
@@ -76,14 +76,14 @@ function createColumn(number) {
     colNum.innerText = number;
     colNum.style.marginBottom = 0;
 
-    const colData = document.createElement('div');
+    const colData = document.createElement('p');
     colData.classList.add("col-data");
 
     const col = document.createElement('div');
     col.classList.add("column");
 
     container.appendChild(colNum);
-    // container.appendChild(colData);
+    container.appendChild(colData);
     container.appendChild(col);
 
     return container;
@@ -167,27 +167,58 @@ function addBagsColumnsAll(cols) {
 
 // Column Data
 function addColumnData(col) {
-    console.log(col);
+    // select display
+    const display = storage.querySelectorAll('.column')[col].querySelector('.col-data');
+    console.log(display);
+    // get data
+    const full = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-full').length;
+    const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-empty').length;
+    // display data
+    const fullBags = document.createElement('div');
+    fullBags.innerText = `Bags Full: ${full}`;
+    const emptyBags = document.createElement('div');
+    emptyBags.innerText = `Bags Empty: ${empty}`;
+
+    display.appendChild(fullBags);
+    display.appendChild(emptyBags);
 };
 
-addColumnData(0);
+// addColumnData(0);
 
 // System Model Settings
 const settings = document.body.querySelector('#system-model-settings');
 settings.save.addEventListener("click", () => {
+    // Model Features
+    cols = settings.columns.value;
+    rows = settings.rows.value;
+    trays = settings.trays.value;
+    bags = settings.bags.value;
+
+    // Regenerate Model
+    storage.innerHTML = '';
+    generateStorage();
+
     // Model Display Rescaling
     if (settings.scale.value === "small") {
         document.body.style.setProperty("--scale", ".42vmin");
-        document.body.style.setProperty("--wrapping", "wrap");
     } else if (settings.scale.value === "medium") {
         document.body.style.setProperty("--scale", "1.5vmin");
-        document.body.style.setProperty("--wrapping", "wrap");
     } else if (settings.scale.value === "large") {
         document.body.style.setProperty("--scale", "3vmin");
-        document.body.style.setProperty("--wrapping", "no-wrap");
     }
 });
 settings.default.addEventListener("click", () => {
+    // Model Features
+    cols = 8;
+    rows = 14;
+    trays = 3;
+    bags = 2;
+
+    // Regenerate Model
+    storage.innerHTML = '';
+    generateStorage();
+
+    // Model Display Rescaling
     document.body.style.setProperty("--scale", ".42vmin");
     document.body.style.setProperty("--wrapping", "wrap");
 });

@@ -1,8 +1,8 @@
 body {
+    margin: 0;
     height: 100%;
     width: 100%;
 
-    --wrapping: no-wrap;
     --scale: .42vmin;
   
     /* theme1 */
@@ -10,6 +10,10 @@ body {
     --color-1: #b7d1ec;
     --color-2: #d3d3d3;
     --color-3: #7f7f7f;
+}
+
+#title {
+    margin-left: 8px;
 }
   
 #system-model-settings {
@@ -23,7 +27,7 @@ body {
     height: 100%;
     width: 100vw;
     overflow-x: scroll;
-    flex-wrap: var(--wrapping);
+    flex-wrap: no-wrap;
     background: var(--color-1);
     border-left: 1px solid var(--color-3);
     border-right: 1px solid var(--color-3);
