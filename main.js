@@ -174,11 +174,15 @@ function addBagsColumnsAll(cols) {
 // System Model Settings
 const settings = document.body.querySelector('#system-model-settings');
 settings.save.addEventListener("click", () => {
-  console.log(settings.scale.value);
-  if (settings.scale.value === "small") {
-  } else if (settings.scale.value === "medium") {
-    
-  } else if (settings.scale.value === "large") {
-    
-  }
+    // Model Display Rescaling
+    if (settings.scale.value === "small") {
+        document.body.style.setProperty("--scale", ".42vmin");
+        document.body.style.setProperty("--wrapping", "wrap");
+    } else if (settings.scale.value === "medium") {
+        document.body.style.setProperty("--scale", "1.5vmin");
+        document.body.style.setProperty("--wrapping", "wrap");
+    } else if (settings.scale.value === "large") {
+        document.body.style.setProperty("--scale", "3vmin");
+        document.body.style.setProperty("--wrapping", "no-wrap");
+    }
 });

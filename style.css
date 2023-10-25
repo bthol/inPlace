@@ -1,15 +1,7 @@
 body {
     height: 100%;
     width: 100%;
-    /* 1 Column  layout */
-    /* --wrapping: wrap; */
-    /* --scale: 3vmin; */
-  
-    /* Mid Scale Layout */
-    /* --wrapping: wrap; */
-    /* --scale: 1.5vmin; */
-  
-    /* Maximize Display */
+
     --wrapping: no-wrap;
     --scale: .42vmin;
   
