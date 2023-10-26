@@ -2,14 +2,20 @@ body {
     margin: 0;
     height: 100%;
     width: 100%;
-
+    
     --scale: .42vmin;
-  
+    
     /* theme1 */
-    background: #f5f5f5;
+    background: hsl(0, 0%, 70%);
     --color-1: #b7d1ec;
     --color-2: #d3d3d3;
     --color-3: #7f7f7f;
+    --color-4: #f5f5f5;
+}
+@media (max-height: 99.99vh) {
+    body {
+        height: 100vh;
+    }
 }
 
 #title {

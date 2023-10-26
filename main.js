@@ -212,5 +212,4 @@ settings.default.addEventListener("click", () => {
 
     // Model Display Rescaling
     document.body.style.setProperty("--scale", ".42vmin");
-    document.body.style.setProperty("--wrapping", "wrap");
 });
