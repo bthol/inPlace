@@ -6,8 +6,8 @@ body {
     --scale: .42vmin;
     
     /* theme1 */
-    background: hsl(0, 0%, 70%);
-    --color-1: #b7d1ec;
+    background: #434e70;
+    --color-1: #a3c9d2;
     --color-2: #d3d3d3;
     --color-3: #7f7f7f;
     --color-4: #f5f5f5;
@@ -20,6 +20,7 @@ body {
 
 #title {
     margin-left: 8px;
+    color: hsl(43, 100%, 62%);
 }
   
 #system-model-settings {
@@ -27,17 +28,33 @@ body {
     border: 1px solid var(--color-3);
     padding: 0px 10px 10px 10px;
 }
-  
+
+.form-layout-block {
+    display: grid;
+}
+
+.content-highlight {
+    width: max-content;
+    padding: 10px;
+    background: var(--color-4);
+    border: 1px solid var(--color-3);
+}
+
 #storage-container {
-    display: flex;
     height: 100%;
-    width: 100vw;
-    overflow-x: scroll;
-    flex-wrap: no-wrap;
+    width: 99.99vw;
+    overflow: scroll;
+    transform: rotateX(180deg);
     background: var(--color-1);
     border-left: 1px solid var(--color-3);
     border-right: 1px solid var(--color-3);
-    border-bottom: 1px solid var(--color-3);
+    border-top: 1px solid var(--color-3);
+}
+
+#storage-content {
+    display: flex;
+    flex-wrap: nowrap;
+    transform: rotateX(180deg);
 }
   
 .column, h3 {
@@ -45,8 +62,9 @@ body {
 }
 
 .col-data {
-    padding: 0px 10px;
+    padding: 0px 8px;
     text-align: right;
+    white-space: nowrap;
 }
   
 .column {

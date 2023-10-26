@@ -35,7 +35,7 @@ let emptyRows = [
 ];
 
 // SYSTEM SETUP
-const storage = document.body.querySelector('#storage-container');
+const storage = document.body.querySelector('#storage-content');
 
 function generateID() {
     let id = "";
@@ -163,7 +163,6 @@ function addBagsColumnsAll(cols) {
 function addColumnData(col) {
     // select display
     const display = storage.querySelectorAll('.col-data')[col];
-    console.log(storage.querySelectorAll('.column')[col]);
     // get data
     const full = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-full').length;
     const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-empty').length;
@@ -185,8 +184,10 @@ function addColumnData(col) {
     display.appendChild(fullRows);
     display.appendChild(emptyRows);
 };
+emptyRow(0, 2);
 addBagsColumn(0);
 addColumnData(0);
+emptyRow(1, 2);
 addColumnData(1);
 
 // System Model Settings

@@ -10,39 +10,39 @@
 <body>
     <div id="control-panel">
         <h1 id="title">Sysmod</h1>
-        <div>
-          <form action="./" method="POST" id="system-model-settings">
-            <p><b>Settings</b></p>
+        <form action="./" method="POST" id="system-model-settings">
+          <p><b>Settings</b></p>
+          <div class="content-highlight">
+            <div class="form-layout-block">
+              <label for="columns">Columns</label>
+              <input name="columns" type="number" min="1" placeholder="number of columns" value="8">
 
-            <label for="columns">Columns:</label>
-            <input name="columns" type="number" min="1" placeholder="number of columns" value="8">
-            <br>
-
-            <label for="rows">Rows:</label>
-            <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
+              <label for="rows">Rows</label>
+              <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
+              
+              <label for="trays">Trays</label>
+              <input name="trays" type="number" min="2" placeholder="number of trays" value="3">
+              
+              <label for="bags">Bags</label>
+              <input name="bags" type="number" min="2" placeholder="number of bags" value="2">
+            </div>
             <br>
             
-            <label for="trays">Trays:</label>
-            <input name="trays" type="number" min="2" placeholder="number of trays" value="3">
-            <br>
-            
-            <label for="bags">Bags:</label>
-            <input name="bags" type="number" min="2" placeholder="number of bags" value="2">
-            <br>
-
-            <label for="scale">Display Scale:</label>
+            <label for="scale">Display Scale </label>
             <select name="scale" id="scale-select">
               <option value="small" >Small</option>
               <option value="medium" >Medium</option>
               <option value="large" >Large</option>
             </select>
-            <br>
-
+            <br><br>
+            
             <button name="save" type="button">Save</button>
             <button name="default" type="button">Default</button>
-          </form>
-        </div>
+          </div>
+        </form>
     </div>
-    <div id="storage-container"></div>
+    <div id="storage-container">
+      <div id="storage-content"></div>
+    </div>
 </body>
 </html>
