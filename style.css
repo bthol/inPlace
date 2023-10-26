@@ -43,6 +43,11 @@ body {
 .column, h3 {
     text-align: center;
 }
+
+.col-data {
+    padding: 0px 10px;
+    text-align: right;
+}
   
 .column {
     padding: var(--scale);

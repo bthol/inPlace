@@ -159,28 +159,40 @@ function addBagsColumnsAll(cols) {
 
 // addBagsColumnsAll(cols);
 
-// Column Data
+// Data
 function addColumnData(col) {
     // select display
-    const display = storage.querySelectorAll('.column')[col].querySelector('.col-data');
-    console.log(display);
+    const display = storage.querySelectorAll('.col-data')[col];
+    console.log(storage.querySelectorAll('.column')[col]);
     // get data
     const full = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-full').length;
     const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-empty').length;
     // display data
     const fullBags = document.createElement('div');
     fullBags.innerText = `Bags Full: ${full}`;
+
     const emptyBags = document.createElement('div');
     emptyBags.innerText = `Bags Empty: ${empty}`;
 
+    const fullRows = document.createElement('div');
+    fullRows.innerText = `Rows Full: ${full / (bags * trays)}`;
+
+    const emptyRows = document.createElement('div');
+    emptyRows.innerText = `Rows Empty: ${empty / (bags * trays)}`;
+
     display.appendChild(fullBags);
     display.appendChild(emptyBags);
+    display.appendChild(fullRows);
+    display.appendChild(emptyRows);
 };
+addBagsColumn(0);
+addColumnData(0);
+addColumnData(1);
 
 // System Model Settings
 const settings = document.body.querySelector('#system-model-settings');
 settings.save.addEventListener("click", () => {
-    // Model Features
+    // Update Model Features
     cols = settings.columns.value;
     rows = settings.rows.value;
     trays = settings.trays.value;
@@ -200,7 +212,7 @@ settings.save.addEventListener("click", () => {
     }
 });
 settings.default.addEventListener("click", () => {
-    // Model Features
+    // Update Model Features
     cols = 8;
     rows = 14;
     trays = 3;
