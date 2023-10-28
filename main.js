@@ -6,29 +6,29 @@ let bags = 2;
 let emptyRows = [
   // [column, row]
   // Col #1
-  [1, 4],
-  [1, 8],
+  [1-1, 4],
+  [1-1, 8],
   
   // Col #2
   
   // Col #3
-  [3, 5],
-  [3, 11],
-  [3, 12],
+  [3-1, 5],
+  [3-1, 11],
+  [3-1, 12],
   
   // Col #4
-  [4, 8],
+  [4-1, 8],
   
   // Col #5
-  [5, 3],
-  [5, 8],
+  [5-1, 3],
+  [5-1, 8],
   
   // Col #6
-  [6, 8],
+  [6-1, 8],
   
   // Col #7
-  [7, 5],
-  [7, 10],
+  [7-1, 5],
+  [7-1, 10],
   
   // Col #8
   
@@ -157,8 +157,6 @@ function addBagsColumnsAll(cols) {
     }
 };
 
-// addBagsColumnsAll(cols);
-
 // Data
 function addColumnData(col) {
     // select display
@@ -168,27 +166,36 @@ function addColumnData(col) {
     const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-empty').length;
     // display data
     const fullBags = document.createElement('div');
-    fullBags.innerText = `Bags Full: ${full}`;
+    fullBags.innerText = `${full} : Bags Full`;
 
     const emptyBags = document.createElement('div');
-    emptyBags.innerText = `Bags Empty: ${empty}`;
+    emptyBags.innerText = `${empty} : Bags Empty`;
 
     const fullRows = document.createElement('div');
-    fullRows.innerText = `Rows Full: ${full / (bags * trays)}`;
+    fullRows.innerText = `${full / (bags * trays)} : Rows Full`;
 
     const emptyRows = document.createElement('div');
-    emptyRows.innerText = `Rows Empty: ${empty / (bags * trays)}`;
+    emptyRows.innerText = `${empty / (bags * trays)} : Rows Empty`;
 
     display.appendChild(fullBags);
     display.appendChild(emptyBags);
     display.appendChild(fullRows);
     display.appendChild(emptyRows);
 };
-emptyRow(0, 2);
-addBagsColumn(0);
-addColumnData(0);
-emptyRow(1, 2);
-addColumnData(1);
+
+function addColumnDataAll(cols) {
+    for (let i = 0; i < cols; i++) {
+        addColumnData(i);
+    }
+};
+
+function updateModelDisplay() {
+    emptyRowsAll(emptyRows);
+    addBagsColumnsAll(cols);
+    addColumnDataAll(cols);
+};
+
+updateModelDisplay();
 
 // System Model Settings
 const settings = document.body.querySelector('#system-model-settings');
@@ -202,6 +209,7 @@ settings.save.addEventListener("click", () => {
     // Regenerate Model
     storage.innerHTML = '';
     generateStorage();
+    updateModelDisplay();
 
     // Model Display Rescaling
     if (settings.scale.value === "small") {
@@ -222,6 +230,7 @@ settings.default.addEventListener("click", () => {
     // Regenerate Model
     storage.innerHTML = '';
     generateStorage();
+    updateModelDisplay();
 
     // Model Display Rescaling
     document.body.style.setProperty("--scale", ".42vmin");

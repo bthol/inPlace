@@ -10,36 +10,63 @@
 <body>
     <div id="control-panel">
         <h1 id="title">Sysmod</h1>
-        <form action="./" method="POST" id="system-model-settings">
-          <p><b>Settings</b></p>
-          <div class="content-highlight">
-            <div class="form-layout-block">
-              <label for="columns">Columns</label>
-              <input name="columns" type="number" min="1" placeholder="number of columns" value="8">
-
-              <label for="rows">Rows</label>
-              <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
+        <div class="panels-section">
+          <form id="system-model-settings" action="./" method="POST">
+            <p><b>Model Settings</b></p>
+            <div class="content-highlight">
+              <div class="form-layout-block">
+                <label for="columns">Columns</label>
+                <input name="columns" type="number" min="1" placeholder="number of columns" value="8">
+  
+                <label for="rows">Rows</label>
+                <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
+                
+                <label for="trays">Trays</label>
+                <input name="trays" type="number" min="2" placeholder="number of trays" value="3">
+                
+                <label for="bags">Bags</label>
+                <input name="bags" type="number" min="2" placeholder="number of bags" value="2">
+              </div>
+              <br>
               
-              <label for="trays">Trays</label>
-              <input name="trays" type="number" min="2" placeholder="number of trays" value="3">
+              <label for="scale">Display Scale </label>
+              <select name="scale" id="scale-select">
+                <option value="small" >Small</option>
+                <option value="medium" >Medium</option>
+                <option value="large" >Large</option>
+              </select>
+              <br><br>
               
-              <label for="bags">Bags</label>
-              <input name="bags" type="number" min="2" placeholder="number of bags" value="2">
+              <button name="save" type="button">Save</button>
+              <button name="default" type="button">Default</button>
             </div>
-            <br>
-            
-            <label for="scale">Display Scale </label>
-            <select name="scale" id="scale-select">
-              <option value="small" >Small</option>
-              <option value="medium" >Medium</option>
-              <option value="large" >Large</option>
-            </select>
-            <br><br>
-            
-            <button name="save" type="button">Save</button>
-            <button name="default" type="button">Default</button>
-          </div>
-        </form>
+          </form>
+          <form id="system-model-controls" action="./" method="POST">
+            <p><b>Operation Control</b></p>
+            <div class="content-highlight">
+              <div><b>Realtime Data</b></div>
+              <br>
+              <div class="data-label-value">
+                <div>Elapsed:</div>
+                <div id="realtime-data-total-duration">00:00:00</div>
+              </div>
+              <div class="data-label-value">
+                <div>Completion:</div>
+                <div id="realtime-data-total-duration">000%</div>
+              </div>
+              <br>
+              <button name="cntrl-run" type="button">Run</button>
+              <button name="cntrl-pause" type="button">Pause</button>
+              <button name="cntrl-reset" type="button">Reset</button>
+            </div>
+          </form>
+          <form id="system-model-controls" action="./" method="POST">
+            <p><b>Data Visualization</b></p>
+            <div class="content-highlight">
+              <div id="graph-model-speed-over-time">Acceleration</div>
+            </div>
+          </form>
+        </div>
     </div>
     <div id="storage-container">
       <div id="storage-content"></div>
