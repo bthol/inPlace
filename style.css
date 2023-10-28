@@ -103,7 +103,7 @@ body {
     margin-bottom: 0vmin;
 }
   
-.tray {
+.container {
     padding: var(--scale);
     background: #d1d1d1;
     border: 1px solid #333333;
@@ -111,15 +111,15 @@ body {
     display: grid;
 }
   
-.bag {
+.slot {
     padding: calc(var(--scale)*2);
     border: 1px solid #333333;
 }
   
-.bag-empty {
+.slot-empty {
     background: #ff4f4f;
 }
   
-.bag-full {
+.slot-full {
     background: #6eff6e;
 }

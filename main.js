@@ -1,8 +1,8 @@
 // PARAMETERS
 let cols = 8;
 let rows = 14;
-let trays = 3;
-let bags = 2;
+let containers = 3;
+let slots = 2;
 let emptyRows = [
   // [column, row]
   // Col #1
@@ -45,26 +45,26 @@ function generateID() {
     return id;
 };
 
-function createTray() {
-    const tray = document.createElement('div');
-    tray.classList.add("tray");
-    for (let i = 0; i < bags; i++) {
-        const bag = document.createElement('div');
-        bag.classList.add("bag");
-        bag.classList.add("bag-empty");
-        bag.setAttribute("id", generateID());
-        bag.innerText = "0";
-        tray.appendChild(bag);
+function createContainer() {
+    const container = document.createElement('div');
+    container.classList.add("container");
+    for (let i = 0; i < slots; i++) {
+        const slot = document.createElement('div');
+        slot.classList.add("slot");
+        slot.classList.add("slot-empty");
+        slot.setAttribute("id", generateID());
+        slot.innerText = "0";
+        container.appendChild(slot);
     }
-    return tray;
+    return container;
 };
 
 function createRow() {
     const row = document.createElement('div');
     row.classList.add("row");
-    for (let i = 0; i < trays; i++) {
-        const tray = createTray();
-        row.appendChild(tray);
+    for (let i = 0; i < containers; i++) {
+        const container = createContainer();
+        row.appendChild(container);
     }
     return row;
 };
@@ -106,12 +106,12 @@ generateStorage();
 function emptyRow(col, row) {
     try {
         storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].classList.add("empty-row");
-        storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.tray').forEach((r) => {
+        storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.container').forEach((r) => {
             r.style.visibility = "hidden";
         });
-        for (let i = 0; i < trays; i++) {
-            for (let j = 0; j < bags; j++) {
-                storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.tray')[i].querySelectorAll('.bag')[j].classList.remove("bag-empty");
+        for (let i = 0; i < containers; i++) {
+            for (let j = 0; j < slots; j++) {
+                storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.container')[i].querySelectorAll('.slot')[j].classList.remove("slot-empty");
             }
         }
     } catch (error) {
@@ -125,35 +125,32 @@ function emptyRowsAll(x) {
     }
 };
 
-function addBags(col, row, tray) {
+function addSlots(col, row, container) {
     try {
         if (!storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].classList.contains('empty-row')) {
-            const bags = storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.tray')[tray].querySelectorAll('.bag');
-            for (let i = 0; i < bags.length; i++) {
-                bags[i].classList.remove("bag-empty");
-                bags[i].classList.add("bag-full");
-                bags[i].innerText = "1";
+            const slots = storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].querySelectorAll('.container')[container].querySelectorAll('.slot');
+            for (let i = 0; i < slots.length; i++) {
+                slots[i].classList.remove("slot-empty");
+                slots[i].classList.add("slot-full");
+                slots[i].innerText = "1";
             }
         }
     } catch (error) {
-        console.log({"operation": "addBags", "error": error});
+        console.log({"operation": "addSlots", "error": error});
     }
 };
-// addBags(0, 3, 0);
-// addBags(0, 3, 1);
-// addBags(0, 3, 2);
 
-function addBagsColumn(col) {
+function addSlotsColumn(col) {
     for (let i = 0; i < rows; i++) {
-        addBags(col, i, 0);
-        addBags(col, i, 1);
-        addBags(col, i, 2);
+        addSlots(col, i, 0);
+        addSlots(col, i, 1);
+        addSlots(col, i, 2);
     }
 };
 
-function addBagsColumnsAll(cols) {
+function addSlotsColumnsAll(cols) {
     for (let i = 0; i < cols; i++) {
-        addBagsColumn(i);
+        addSlotsColumn(i);
     }
 };
 
@@ -162,23 +159,23 @@ function addColumnData(col) {
     // select display
     const display = storage.querySelectorAll('.col-data')[col];
     // get data
-    const full = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-full').length;
-    const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.bag-empty').length;
+    const full = storage.querySelectorAll('.column')[col].querySelectorAll('.slot-full').length;
+    const empty = storage.querySelectorAll('.column')[col].querySelectorAll('.slot-empty').length;
     // display data
-    const fullBags = document.createElement('div');
-    fullBags.innerText = `${full} : Bags Full`;
+    const fullSlots = document.createElement('div');
+    fullSlots.innerText = `${full} : Slots Full`;
 
-    const emptyBags = document.createElement('div');
-    emptyBags.innerText = `${empty} : Bags Empty`;
+    const emptySlots = document.createElement('div');
+    emptySlots.innerText = `${empty} : Slots Empty`;
 
     const fullRows = document.createElement('div');
-    fullRows.innerText = `${full / (bags * trays)} : Rows Full`;
+    fullRows.innerText = `${full / (slots * containers)} : Rows Full`;
 
     const emptyRows = document.createElement('div');
-    emptyRows.innerText = `${empty / (bags * trays)} : Rows Empty`;
+    emptyRows.innerText = `${empty / (slots * containers)} : Rows Empty`;
 
-    display.appendChild(fullBags);
-    display.appendChild(emptyBags);
+    display.appendChild(fullSlots);
+    display.appendChild(emptySlots);
     display.appendChild(fullRows);
     display.appendChild(emptyRows);
 };
@@ -191,7 +188,7 @@ function addColumnDataAll(cols) {
 
 function updateModelDisplay() {
     emptyRowsAll(emptyRows);
-    addBagsColumnsAll(cols);
+    addSlotsColumnsAll(cols);
     addColumnDataAll(cols);
 };
 
@@ -203,8 +200,8 @@ settings.save.addEventListener("click", () => {
     // Update Model Features
     cols = settings.columns.value;
     rows = settings.rows.value;
-    trays = settings.trays.value;
-    bags = settings.bags.value;
+    containers = settings.containers.value;
+    slots = settings.slots.value;
 
     // Regenerate Model
     storage.innerHTML = '';
@@ -224,8 +221,8 @@ settings.default.addEventListener("click", () => {
     // Update Model Features
     cols = 8;
     rows = 14;
-    trays = 3;
-    bags = 2;
+    containers = 3;
+    slots = 2;
 
     // Regenerate Model
     storage.innerHTML = '';
