@@ -238,7 +238,7 @@ settings.default.addEventListener("click", () => {
 const resolution = document.body.querySelector('#data-resolution');
 const resVal = document.body.querySelector('#data-resolution-val');
 
-resVal.textContent = resolution.value;
+resVal.textContent = `0${resolution.value}`;
 
 resolution.addEventListener('dblclick', () => {
     resolution.value = 50;
