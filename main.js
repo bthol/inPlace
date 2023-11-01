@@ -1,34 +1,35 @@
 // PARAMETERS
-let cols = 8;
-let rows = 14;
-let containers = 3;
+let cols = 2;
+let rows = 2;
+let containers = 2;
 let slots = 2;
 let emptyRows = [
   // [column, row]
   // Col #1
-  [1-1, 4],
-  [1-1, 8],
+//   [1-1, 4],
+//   [1-1, 8],
   
   // Col #2
+//   [2-1, 8],
   
   // Col #3
-  [3-1, 5],
-  [3-1, 11],
-  [3-1, 12],
+//   [3-1, 5],
+//   [3-1, 11],
+//   [3-1, 12],
   
   // Col #4
-  [4-1, 8],
+//   [4-1, 8],
   
   // Col #5
-  [5-1, 3],
-  [5-1, 8],
+//   [5-1, 3],
+//   [5-1, 8],
   
   // Col #6
-  [6-1, 8],
+//   [6-1, 8],
   
   // Col #7
-  [7-1, 5],
-  [7-1, 10],
+//   [7-1, 5],
+//   [7-1, 10],
   
   // Col #8
   
@@ -191,7 +192,6 @@ function updateModelDisplay() {
     addSlotsColumnsAll(cols);
     addColumnDataAll(cols);
 };
-
 updateModelDisplay();
 
 // System Model Settings
@@ -217,11 +217,12 @@ settings.save.addEventListener("click", () => {
         document.body.style.setProperty("--scale", "3vmin");
     }
 });
+
 settings.default.addEventListener("click", () => {
     // Update Model Features
-    cols = 8;
-    rows = 14;
-    containers = 3;
+    cols = 2;
+    rows = 2;
+    containers = 2;
     slots = 2;
 
     // Regenerate Model
@@ -231,4 +232,25 @@ settings.default.addEventListener("click", () => {
 
     // Model Display Rescaling
     document.body.style.setProperty("--scale", ".42vmin");
+});
+
+// resolution slider display
+const resolution = document.body.querySelector('#data-resolution');
+const resVal = document.body.querySelector('#data-resolution-val');
+
+resVal.textContent = resolution.value;
+
+resolution.addEventListener('dblclick', () => {
+    resolution.value = 50;
+    resVal.textContent = `0${resolution.value}`;
+});
+
+resolution.addEventListener('input', () => {
+    if (resolution.value.length === 3) {
+        resVal.textContent = resolution.value;
+    } else if (resolution.value.length === 2) {
+        resVal.textContent = `0${resolution.value}`;
+    } else {
+        resVal.textContent = `00${resolution.value}`;
+    }
 });

@@ -18,6 +18,12 @@ body {
     }
 }
 
+.center-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .data-label-value {
     display: flex;
     flex-wrap: nowrap;
@@ -26,19 +32,21 @@ body {
 
 #title {
     margin-left: 8px;
-    color: hsl(43, 100%, 56%);
+    color: #ffbf1f;
 }
 
 .panels-section {
     display: flex;
+    flex-wrap: wrap;
     background: var(--color-2);
     border: 1px solid var(--color-3);
-    padding: 0px 10px 10px 10px;
+    padding: 5px;
 }
 
 .panels-section form {
-    margin-left: 8px;
+    margin: 5px;
 }
+
 
 .form-layout-block {
     display: grid;

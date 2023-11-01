@@ -12,11 +12,11 @@
         <h1 id="title">Sysmod</h1>
         <div class="panels-section">
           <form id="system-model-settings" action="./" method="POST">
-            <p><b>Model Settings</b></p>
             <div class="content-highlight">
+              <p><b>Model Features</b></p>
               <div class="form-layout-block">
                 <label for="columns">Columns</label>
-                <input name="columns" type="number" min="1" placeholder="number of columns" value="8">
+                <input name="columns" type="number" min="2" placeholder="number of columns" value="8">
   
                 <label for="rows">Rows</label>
                 <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
@@ -42,8 +42,8 @@
             </div>
           </form>
           <form id="system-model-controls" action="./" method="POST">
-            <p><b>Operation Control</b></p>
             <div class="content-highlight">
+              <p><b>Operation Control</b></p>
               <div class="data-label-value">
                 <div>Elapsed:</div>
                 <div id="realtime-data-total-duration">00:00:00</div>
@@ -59,9 +59,18 @@
             </div>
           </form>
           <form id="system-model-controls" action="./" method="POST">
-            <p><b>Data Visualization</b></p>
             <div class="content-highlight">
-              <div id="graph-model-speed-over-time">Acceleration</div>
+              <p><b>Data Visualization</b></p>
+              <div class="form-layout-block">
+                <label for="resolutuion">Resolutuion</label>
+                <div class="center-flex">
+                  <output id="data-resolution-val" for="resolutuion"></output>
+                  <input id="data-resolution" name="resolutuion" type="range" min="1" max="100" step="1" value="50">
+                </div>
+                <button name="res-but-save" type="button">Save</button>
+              </div>
+              <br>
+              <div id="graph-model-change">velocity + acceleration</div>
             </div>
           </form>
         </div>
