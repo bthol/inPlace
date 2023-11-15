@@ -11,9 +11,9 @@
     <div id="control-panel">
         <h1 id="title">Sysmod</h1>
         <div class="panels-section">
-          <form id="system-model-settings" action="./" method="POST">
+          <form id="system-model-parameters" action="./" method="POST">
             <div class="content-highlight">
-              <p><b>Model Features</b></p>
+              <p><b>Model Parameters</b></p>
               <div class="form-layout-block">
                 <label for="columns">Columns</label>
                 <input name="columns" type="number" min="2" placeholder="number of columns" value="8">
@@ -26,6 +26,11 @@
                 
                 <label for="slots">slots</label>
                 <input name="slots" type="number" min="2" placeholder="number of slots" value="2">
+              </div>
+              <br>
+              <div class="form-layout-block">
+                <div id="empty-row-form-container" class="form-layout-block"></div>
+                <button name="addEmptyRowButton" type="button">add empty row</button>
               </div>
               <br>
               
@@ -43,7 +48,7 @@
           </form>
           <form id="system-model-controls" action="./" method="POST">
             <div class="content-highlight">
-              <p><b>Operation Control</b></p>
+              <p><b>Runtime Controls</b></p>
               <div class="data-label-value">
                 <div>Elapsed:</div>
                 <div id="realtime-data-total-duration">00:00:00</div>
@@ -60,7 +65,7 @@
           </form>
           <form id="system-model-controls" action="./" method="POST">
             <div class="content-highlight">
-              <p><b>Data Visualization</b></p>
+              <p><b>Real-Time Data Visualization</b></p>
               <div class="form-layout-block">
                 <label for="resolutuion">Resolutuion</label>
                 <div class="center-flex">
@@ -70,7 +75,7 @@
                 <button name="res-but-save" type="button">Save</button>
               </div>
               <br>
-              <div id="graph-model-change">velocity + acceleration</div>
+              <div id="graph-model-change-over-time"></div>
             </div>
           </form>
         </div>

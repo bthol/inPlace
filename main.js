@@ -103,7 +103,7 @@ function generateStorage() {
 };
 generateStorage();
 
-// SYSTEM OPERATION
+// MODEL OPERATION
 function emptyRow(col, row) {
     try {
         storage.querySelectorAll('.column')[col].querySelectorAll('.row')[row].classList.add("empty-row");
@@ -143,9 +143,9 @@ function addSlots(col, row, container) {
 
 function addSlotsColumn(col) {
     for (let i = 0; i < rows; i++) {
-        addSlots(col, i, 0);
-        addSlots(col, i, 1);
-        addSlots(col, i, 2);
+        for (let j = 0; j < containers; j++) {
+            addSlots(col, i, j);
+        }
     }
 };
 
@@ -194,14 +194,76 @@ function updateModelDisplay() {
 };
 updateModelDisplay();
 
-// System Model Settings
-const settings = document.body.querySelector('#system-model-settings');
-settings.save.addEventListener("click", () => {
-    // Update Model Features
-    cols = settings.columns.value;
-    rows = settings.rows.value;
-    containers = settings.containers.value;
-    slots = settings.slots.value;
+// Model Parameters
+const parameters = document.body.querySelector('#system-model-parameters');
+let emptyRowFormID = 0;
+function listenRemoveForm(button, formID) {
+    function removeForm() {
+        const form = document.querySelector(`#${formID}`);
+        form.deleteFormButton.removeEventListener("click", removeForm);
+        form.remove();
+    }
+    button.addEventListener("click", removeForm);
+};
+parameters.addEmptyRowButton.addEventListener('click', () => {
+    const form = document.createElement('form');
+    form.setAttribute('action', './');
+    form.setAttribute('method', 'POST');
+    form.setAttribute('class', `empty-row-form`);
+    form.setAttribute('id', `empty-row-form-${emptyRowFormID}`);
+    const formID = `empty-row-form-${emptyRowFormID}`;
+    
+    const formLabel = document.createElement('label');
+    formLabel.innerText = "Column/Row ";
+    
+    const inputColumn = document.createElement('input');
+    inputColumn.setAttribute('class', 'input-column');
+    inputColumn.setAttribute('type', 'number');
+    inputColumn.setAttribute('value', '1');
+    inputColumn.setAttribute('min', '1');
+    inputColumn.setAttribute('max', `${parameters.columns.value}`);
+    inputColumn.style.width = "50px";
+    
+    const inputRow = document.createElement('input');
+    inputRow.setAttribute('class', 'input-row');
+    inputRow.setAttribute('type', 'number');
+    inputRow.setAttribute('value', '1');
+    inputRow.setAttribute('min', '1');
+    inputRow.setAttribute('max', `${parameters.rows.value}`);
+    inputRow.style.width = "50px";
+    
+    const deleteFormButton = document.createElement('button');
+    deleteFormButton.setAttribute('type', 'button');
+    deleteFormButton.setAttribute('name', "deleteFormButton");
+    deleteFormButton.innerText = "remove";
+    listenRemoveForm(deleteFormButton, formID);
+    
+    form.appendChild(formLabel);
+    form.appendChild(inputColumn);
+    form.appendChild(inputRow);
+    form.appendChild(deleteFormButton);
+    parameters.querySelector('#empty-row-form-container').appendChild(form);
+    emptyRowFormID += 1;
+});
+
+// dynamcially update empty row input maximums based on current column and row parameters
+// parameters.columns.addEventListener("input", () => {
+//     parameters.querySelectorAll('.input-columns').forEach((column) => {
+//         column.setAttribute('max', `${parameters.columns.value}`);
+//     })
+// })
+// parameters.rows.addEventListener("input", () => {
+//     parameters.querySelectorAll('.input-row').forEach((row) => {
+//         row.setAttribute('max', `${parameters.rows.value}`);
+//     })
+// })
+
+parameters.save.addEventListener("click", () => {
+    // Update Model Parameters
+    cols = parameters.columns.value;
+    rows = parameters.rows.value;
+    containers = parameters.containers.value;
+    slots = parameters.slots.value;
 
     // Regenerate Model
     storage.innerHTML = '';
@@ -209,21 +271,21 @@ settings.save.addEventListener("click", () => {
     updateModelDisplay();
 
     // Model Display Rescaling
-    if (settings.scale.value === "small") {
+    if (parameters.scale.value === "small") {
         document.body.style.setProperty("--scale", ".42vmin");
-    } else if (settings.scale.value === "medium") {
+    } else if (parameters.scale.value === "medium") {
         document.body.style.setProperty("--scale", "1.5vmin");
-    } else if (settings.scale.value === "large") {
+    } else if (parameters.scale.value === "large") {
         document.body.style.setProperty("--scale", "3vmin");
     }
 });
-
-settings.default.addEventListener("click", () => {
-    // Update Model Features
+parameters.default.addEventListener("click", () => {
+    // Update Model Parameters
     cols = 2;
     rows = 2;
     containers = 2;
     slots = 2;
+    parameters.querySelector('#empty-row-form-container').innerHTML = '';
 
     // Regenerate Model
     storage.innerHTML = '';
@@ -254,3 +316,6 @@ resolution.addEventListener('input', () => {
         resVal.textContent = `00${resolution.value}`;
     }
 });
+
+// generate graph
+const graph = document.body.querySelector('#graph-model-change-over-time');
