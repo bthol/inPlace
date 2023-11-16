@@ -247,16 +247,22 @@ parameters.addEmptyRowButton.addEventListener('click', () => {
 });
 
 // dynamcially update empty row input maximums based on current column and row parameters
-// parameters.columns.addEventListener("input", () => {
-//     parameters.querySelectorAll('.input-columns').forEach((column) => {
-//         column.setAttribute('max', `${parameters.columns.value}`);
-//     })
-// })
-// parameters.rows.addEventListener("input", () => {
-//     parameters.querySelectorAll('.input-row').forEach((row) => {
-//         row.setAttribute('max', `${parameters.rows.value}`);
-//     })
-// })
+parameters.columns.addEventListener("input", () => {
+    parameters.querySelectorAll('.input-column').forEach((column) => {
+        column.setAttribute('max', `${parameters.columns.value}`);
+        if (Number(column.value) > Number(parameters.columns.value)) {
+            column.value = parameters.columns.value;
+        }
+    })
+})
+parameters.rows.addEventListener("input", () => {
+    parameters.querySelectorAll('.input-row').forEach((row) => {
+        row.setAttribute('max', `${parameters.rows.value}`);
+        if (Number(row.value) > Number(parameters.rows.value)) {
+            row.value = parameters.rows.value;
+        }
+    })
+})
 
 parameters.save.addEventListener("click", () => {
     // Update Model Parameters
