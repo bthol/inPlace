@@ -273,10 +273,12 @@ parameters.save.addEventListener("click", () => {
     rows = parameters.rows.value;
     containers = parameters.containers.value;
     slots = parameters.slots.value;
+    // reset empty rows structure
+    emptyRows = [];
     // select col/row pairs in list
     parameters.querySelectorAll('.empty-row-form').forEach((form) => {
         // iteratively add pairs as arrays to emptyRows array
-        emptyRows.push([Number(form.inputColumn.value), Number(form.inputRow.value)]);
+        emptyRows.push([Number(form.inputColumn.value) - 1, Number(form.inputRow.value) - 1]);
     });
 
     // Regenerate Model
