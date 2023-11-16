@@ -217,6 +217,7 @@ parameters.addEmptyRowButton.addEventListener('click', () => {
     formLabel.innerText = "Column/Row ";
     
     const inputColumn = document.createElement('input');
+    inputColumn.setAttribute('name', 'inputColumn');
     inputColumn.setAttribute('class', 'input-column');
     inputColumn.setAttribute('type', 'number');
     inputColumn.setAttribute('value', '1');
@@ -225,6 +226,7 @@ parameters.addEmptyRowButton.addEventListener('click', () => {
     inputColumn.style.width = "50px";
     
     const inputRow = document.createElement('input');
+    inputRow.setAttribute('name', 'inputRow');
     inputRow.setAttribute('class', 'input-row');
     inputRow.setAttribute('type', 'number');
     inputRow.setAttribute('value', '1');
@@ -254,7 +256,7 @@ parameters.columns.addEventListener("input", () => {
             column.value = parameters.columns.value;
         }
     })
-})
+});
 parameters.rows.addEventListener("input", () => {
     parameters.querySelectorAll('.input-row').forEach((row) => {
         row.setAttribute('max', `${parameters.rows.value}`);
@@ -262,14 +264,20 @@ parameters.rows.addEventListener("input", () => {
             row.value = parameters.rows.value;
         }
     })
-})
+});
 
+// parameter form button listeners
 parameters.save.addEventListener("click", () => {
     // Update Model Parameters
     cols = parameters.columns.value;
     rows = parameters.rows.value;
     containers = parameters.containers.value;
     slots = parameters.slots.value;
+    // select col/row pairs in list
+    parameters.querySelectorAll('.empty-row-form').forEach((form) => {
+        // iteratively add pairs as arrays to emptyRows array
+        emptyRows.push([Number(form.inputColumn.value), Number(form.inputRow.value)]);
+    });
 
     // Regenerate Model
     storage.innerHTML = '';
@@ -291,9 +299,10 @@ parameters.default.addEventListener("click", () => {
     rows = 2;
     containers = 2;
     slots = 2;
-    parameters.querySelector('#empty-row-form-container').innerHTML = '';
-
+    emptyRows = [];
+    
     // Regenerate Model
+    parameters.querySelector('#empty-row-form-container').innerHTML = '';
     storage.innerHTML = '';
     generateStorage();
     updateModelDisplay();
