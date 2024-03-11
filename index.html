@@ -11,44 +11,151 @@
     <div id="control-panel">
         <h1 id="title">Sysmod</h1>
         <div class="panels-section">
-          <form id="system-model-parameters" action="./" method="POST">
-            <div class="content-highlight">
-              <p><b>Model Parameters</b></p>
-              <div class="form-layout-block">
-                <label for="columns">Columns</label>
-                <input name="columns" type="number" min="2" placeholder="number of columns" value="8">
-  
-                <label for="rows">Rows</label>
-                <input name="rows" type="number" min="2" placeholder="number of rows" value="14">
-                
-                <label for="containers">containers</label>
-                <input name="containers" type="number" min="2" placeholder="number of containers" value="3">
-                
-                <label for="slots">slots</label>
-                <input name="slots" type="number" min="2" placeholder="number of slots" value="2">
+
+          <form id="model-parameters" action="./" method="POST" class="content-highlight">
+            <div class="center-flex">
+              <p><big><b>Model Parameters</b></big></p>
+            </div>
+
+            <div id="space-form-container">
+
+              <div id="space-form-0" class="content-highlight2">
+                <div class="form-layout-block center-flex">
+                  <label for="data"><u>Space 1</u></label>
+                </div>
+                <br>
+                <div name="data" class="form-layout-block">
+                  <label for="name-space">Name</label>
+                  <input name="name-space" type="text" min="1" placeholder="Name of space" required>
+
+                  <label for="x-dimension">X dimension</label>
+                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required>
+                  
+                  <label for="y-dimension">Y dimension</label>
+                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
+                  
+                  <label for="z-dimension">Z dimension</label>
+                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required>
+                </div>
+                <br>
+                <div class="form-layout-block center-flex">
+                  <div id="obstructions"></div>
+                  <button class="button-style-1 btn-add-obstruct" type="button">add obstruction</button>
+                </div>
               </div>
-              <br>
-              <div class="form-layout-block">
-                <div id="empty-row-form-container" class="form-layout-block"></div>
-                <button name="addEmptyRowButton" type="button">add empty row</button>
+
+            </div>
+
+            <div class="form-layout-block center-flex">
+              <button class="button-style-1" id="btn-add-space" type="button">add space</button>
+            </div>
+
+            <hr noshade="true">
+
+            <div id="object-form-container">
+              <div id="object-1" class="content-highlight2">
+                <div class="form-layout-block center-flex">
+                  <label for="space-1"><u>Object 1</u></label>
+                </div>
+                <br>
+                <div class="form-layout-block">
+                  <label for="name-object">Name</label>
+                  <input name="name-object" type="text" min="1" placeholder="Name of object" required>
+                  
+                  <label for="x-dimension">X dimension</label>
+                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required>
+                  
+                  <label for="y-dimension">Y dimension</label>
+                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
+                  
+                  <label for="z-dimension">Z dimension</label>
+                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required>
+                  
+                </div>
+                <div class="form-layout-block">
+                  <label for="quantity">Quantity</label>
+                  <input name="quantity" type="number" min="1" placeholder="Quantity of object" required>
+                </div>
               </div>
-              <br>
-              
-              <label for="scale">Display Scale </label>
-              <select name="scale" id="scale-select">
-                <option value="small" >Small</option>
-                <option value="medium" >Medium</option>
-                <option value="large" >Large</option>
-              </select>
-              <br><br>
-              
-              <button name="save" type="button">Save</button>
-              <button name="default" type="button">Default</button>
+            </div>
+
+            <div class="form-layout-block center-flex">
+              <button class="button-style-1" id="btn-add-object" type="button">add object</button>
+            </div>
+            
+            <hr noshade="true">
+
+            <div class="form-layout-block">
+              <button class="button-style-3" name="save" type="submit">Generate Model</button>
+              <button class="button-style-3" name="default" type="button">Initialize Parameters</button>
             </div>
           </form>
-          <form id="system-model-controls" action="./" method="POST">
+
+          <form id="visualization-parameters" action="./" method="POST">
             <div class="content-highlight">
-              <p><b>Runtime Controls</b></p>
+
+              <div class="center-flex">
+                <p><big><b>Visualization</b></big></p>
+              </div>
+
+              <div class="content-highlight2">
+                <div class="form-layout-block">
+                  <div class="slider-container">
+                    <div class="center-flex">
+                      <label for="playback-multiplier">Playback Multiplier</label>
+                    </div>
+                    <div class="slider-layout">
+                      <input id="playback-multiplier" name="playback-multiplier" type="range" min="1" max="100" step="1" value="50" list="playback-multiplier-markers">
+                      <output id="playback-multiplier-val" for="playback-multiplier"></output>
+                    </div>
+                    <datalist id="playback-multiplier-markers">
+                      <option value="1" label="0.02"></option>
+                      <option value="25" label="0.50"></option>
+                      <option value="50" label="1.00"></option>
+                      <option value="75" label="1.50"></option>
+                      <option value="100" label="2.00"></option>
+                    </datalist>
+                  </div>
+                </div>
+
+                <hr noshade="true">
+
+                <div class="form-layout-block">
+                  <div class="slider-container">
+                    <div class="center-flex">
+                      <label for="graph-resolutuion">Graph Resolutuion</label>
+                    </div>
+                    <div class="slider-layout">
+                      <input id="graph-resolution" name="graph-resolutuion" type="range" min="1" max="100" step="1" value="50" list="graph-resolution-markers">
+                      <output id="graph-resolution-val" for="graph-resolutuion"></output>
+                      <datalist id="graph-resolution-markers">
+                        <option value="1"></option>
+                        <option value="25"></option>
+                        <option value="50"></option>
+                        <option value="75"></option>
+                        <option value="100"></option>
+                      </datalist>
+                    </div> 
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="form-layout-block">
+                <button class="button-style-3" name="res-but-save" type="button">Save</button>
+              </div>
+
+            </div>
+          </form>
+
+          <form id="playback-controls" action="./" method="POST">
+            <div class="content-highlight">
+              <div class="center-flex">
+                <p><big><b>Playback Controls</b></big></p>
+              </div>
+
+              <hr noshade="true">
+
               <div class="data-label-value">
                 <div>Elapsed:</div>
                 <div id="realtime-data-total-duration">00:00:00</div>
@@ -57,31 +164,18 @@
                 <div>Completion:</div>
                 <div id="realtime-data-total-duration">000%</div>
               </div>
-              <br>
-              <button name="cntrl-run" type="button">Run</button>
-              <button name="cntrl-pause" type="button">Pause</button>
-              <button name="cntrl-reset" type="button">Reset</button>
-            </div>
-          </form>
-          <form id="system-model-controls" action="./" method="POST">
-            <div class="content-highlight">
-              <p><b>Real-Time Data Visualization</b></p>
-              <div class="form-layout-block">
-                <label for="resolutuion">Resolutuion</label>
-                <div class="center-flex">
-                  <output id="data-resolution-val" for="resolutuion"></output>
-                  <input id="data-resolution" name="resolutuion" type="range" min="1" max="100" step="1" value="50">
-                </div>
-                <button name="res-but-save" type="button">Save</button>
+              <div class="content-highlight2">
+                <button class="button-style-2" name="cntrl-run" type="button">Play</button>
+                <button class="button-style-2" name="cntrl-pause" type="button">Pause</button>
+                <button class="button-style-2" name="cntrl-reset" type="button">Reset</button>
               </div>
-              <br>
-              <div id="graph-model-change-over-time"></div>
             </div>
           </form>
+
         </div>
     </div>
-    <div id="storage-container">
-      <div id="storage-content"></div>
+    <div id="visualizer-container">
+      <div id="visualizer-content"></div>
     </div>
 </body>
 </html>
