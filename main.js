@@ -27,7 +27,6 @@ let spaceDef = [
     },
 ];
 
-
 function modelSpaces(spaceDef) {
     let spaces = [];
     for ( let i = 0; i < spaceDef.length; i++ ) {
@@ -58,21 +57,50 @@ function modelSpaces(spaceDef) {
     return spaces;
 };
 
-let spatialModels = modelSpaces(spaceDef);
-console.log(spatialModels);
-
 function getCoor(model, coordinate) {
-    // period of change for first dimension = LCM of second and third dimensions
-    // console.log(coordinate[0] * spaceDef[field].y * spaceDef[field].z); // for the x dimension
-    // console.log(coordinate[1] * spaceDef[field].z); // for the y dimension
-    // console.log(coordinate[2]); // for the z dimension
+    // Each spatial model is an organized list of objects, where each object represents a point in the space modelled.
+    // Their method of generation is three levels of nested iteration (cubic complexity; O(n^3)).
+    
+    // Because a nested iterator must complete all of its iterations before changing the iteration for the superiterator,
+    // higher levels of iterator nesting cause higher frequencies of iterator operation.
+
+    // In model generation, level of iterator nesting ordered from least to most is x, y, z.
+    
+    // To calculate the rate of change for a coordinate, one must divide the number of objects in the list by the number of changes to that coordinate in the list.
+    
+    // Becuase z has the highest level of nesting and thus the highest rate of change, z values change for every object in the list A.K.A. the number of objects in the list.
+    // Therefore,
+    // the rate of change for z in the list is the number of objects in the list / the number of objects in the list or just 1.
+    
+    // y, being the superiterator of z, only changes after every iteration of z has been completed.
+    // Therefore,
+    // the rate of change for y in the list is z.
+    
+    // The number of objects in the spatial model is equal to the number of points in the space modelled (maximum structural efficiency).
+    // The number of points in 3D space can be calculated by x * y * z
+    // Therefore,
+    // The rate of change for x in the list is the number of objects in the list / x  A.K.A.  x * y * z / x = y * z
+
+    // The rates of change for a coordinate can be multiplied by their respective coordinates values to determine the minimum ammount into the list that the coordinate triple with that coordinate value must be.
+    // The minimums for each coordinate value can be summed to produce the index in the list at which there exists that coordinate triple
+    
+    // x coordinate value * rate of change of x in list + y coordinate value * rate of change of y in list + z coordinate value * rate of change of z in list
+    // rate of change for z in list = 1
+    // rate of change for y in list = z
+    // rate of change for x in list = y * z
+    // Therefore,
+    // the index in the list for the coordinate triple with given coordinate values = x coordinate value * y * z + y coordinate value * z + z coordinate value
+
+    // That index can be calculated at constant complexity; O(c).
+
+    // The idex can be used to find the object representing the point with a given coordinate triple in a given spatial model (which space? which point?).
     return spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]];
 };
 
+let spatialModels = modelSpaces(spaceDef);
+console.log(spatialModels);
 let coor1 = getCoor(0, [3, 2, 1]);
-console.log(coor1);
-
-
+// console.log(coor1);
 
 // OBJECT
 let objectDef = [
