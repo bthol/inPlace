@@ -1,46 +1,81 @@
-let spaces = [
+//  SPACE
+let spaceDef = [
     {
         name: "space-1",
         x: 10,
         y: 10,
         z: 10,
+        quadrant: 1,
+        obstruct : [
+            {
+                xi: 2,
+                xf: 4,
+                yi: 0,
+                yf: 2,
+                zi: 2,
+                zf: 4,
+            }
+        ],
+    },
+    {
+        name: "space-2",
+        x: 5,
+        y: 5,
+        z: 5,
+        quadrant: 4,
         obstruct : [],
-    }
-    // {
-    //     name: "space_1",
-    //     x: 10,
-    //     y: 10,
-    //     z: 3,
-    //     obstruct: [
-    //         {
-    //             xi: 9,
-    //             xf: 10,
-    //             yi: 9,
-    //             yf: 10,
-    //             zi: 1,
-    //             zf: 2,
-    //         },
-    //     ],
-    // },
-    // {
-    //     name: "space_2",
-    //     x: 10,
-    //     y: 10,
-    //     z: 3,
-    //     obstruct: [
-    //         {
-    //             xi: 9,
-    //             xf: 10,
-    //             yi: 9,
-    //             yf: 10,
-    //             zi: 1,
-    //             zf: 2,
-    //         },
-    //     ],
-    // },
+    },
 ];
 
-let objects = [
+
+function modelSpaces(spaceDef) {
+    let spaces = [];
+    for ( let i = 0; i < spaceDef.length; i++ ) {
+        let space = [];
+        if (spaceDef[i].quadrant === 1) {
+            // one quadrant coordinate field
+            for (let x = 0; x < spaceDef[i].x; x++) {
+                for (let y = 0; y < spaceDef[i].y; y++) {
+                    for (let z = 0; z < spaceDef[i].z; z++) {
+                        // each coordinate point
+                        space.push({coor: [x, y, z], open: true});
+                    }
+                }
+            }
+        } else {
+            // four quadrant coordinate field
+            for (let x = -(Math.ceil(spaceDef[i].x / 2)) + 1; x < Math.floor(spaceDef[i].x / 2) + 1; x++) {
+                for (let y = -(Math.ceil(spaceDef[i].y / 2)) + 1; y < Math.floor(spaceDef[i].y / 2) + 1; y++) {
+                    for (let z = -(Math.ceil(spaceDef[i].z / 2)) + 1; z < Math.floor(spaceDef[i].z / 2) + 1; z++) {
+                        // each coordinate point
+                        space.push({coor: [x, y, z], open: true});
+                    }
+                }
+            }
+        }
+        spaces.push(space);
+    }
+    return spaces;
+};
+
+let spatialModels = modelSpaces(spaceDef);
+console.log(spatialModels);
+
+function getCoor(model, coordinate) {
+    // period of change for first dimension = LCM of second and third dimensions
+    // console.log(coordinate[0] * spaceDef[field].y * spaceDef[field].z); // for the x dimension
+    // console.log(coordinate[1] * spaceDef[field].z); // for the y dimension
+    // console.log(coordinate[2]); // for the z dimension
+    return spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]];
+};
+
+let coor1 = getCoor(0, [3, 2, 1]);
+console.log(coor1);
+
+
+
+// OBJECT
+let objectDef = [
     {
         x: 1,
         y: 1,
@@ -56,6 +91,10 @@ let objects = [
         quantity: 1,
     },
 ];
+
+function modelObjects(objectDef) {
+
+};
 
 // Document Object Model selections
 const panel = document.body.querySelector('#control-panel');
