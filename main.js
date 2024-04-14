@@ -1,15 +1,16 @@
-// user interacts with forms in interface to establish defintions of space in spaceDef structure
-// definitions are used to generate spatial models in a separate spatialModels structure
-// Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
+// The Programic Process
+// I.       user interacts with forms in interface to establish defintions of space in spaceDef structure
+// II.      definitions are used to generate spatial models in a separate spatialModels structure
+// III.     Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
 
 //  SPACE
 let spaceDef = [
     {
         id: "space-1",
-        x: 9,
-        y: 11,
-        z: 10,
-        integer: false,
+        x: 8,
+        y: 6,
+        z: 4,
+        integer: true,
         octant: false,
         obstruct : [
             {
@@ -23,18 +24,18 @@ let spaceDef = [
         ],
     },
     
-    {
-        id: "space-2",
-        x: 5,
-        y: 5,
-        z: 5,
-        integer: true,
-        octant: true,
-        obstruct : [],
-    },
+    // {
+    //     id: "space-2",
+    //     x: 5,
+    //     y: 5,
+    //     z: 5,
+    //     integer: true,
+    //     octant: true,
+    //     obstruct : [],
+    // },
 ];
 
-function modelSpaces(spaceDef) {
+function generateModels(spaceDef) {
     let spaces = [];
     for ( let i = 0; i < spaceDef.length; i++ ) {
 
@@ -91,9 +92,9 @@ function modelSpaces(spaceDef) {
             if (spaceDef[i].octant === false) {
 
                 // integer coordinate field
-                for (let x = 0; x < spaceDef[i].x; x++) {
-                    for (let y = 0; y < spaceDef[i].y; y++) {
-                        for (let z = 0; z < spaceDef[i].z; z++) {
+                for (let x = -(Math.ceil(spaceDef[i].x / 2)) + 1; x < Math.floor(spaceDef[i].x / 2) + 1; x++) {
+                    for (let y = -(Math.ceil(spaceDef[i].y / 2)) + 1; y < Math.floor(spaceDef[i].y / 2) + 1; y++) {
+                        for (let z = -(Math.ceil(spaceDef[i].z / 2)) + 1; z < Math.floor(spaceDef[i].z / 2) + 1; z++) {
                             // each coordinate point
                             space.push({space: spaceDef[i].id, coor: [x, y, z], open: true});
                         }
@@ -136,43 +137,62 @@ function modelSpaces(spaceDef) {
 };
 
 function getPoint(model, coordinate) {
-    // Each spatial model is an organized list of objects, where each object represents a point in the space modelled.
-    // Their method of generation is three levels of nested iteration (cubic complexity; O(n^3)).
-    
-    // Because a nested iterator must complete all of its iterations before changing the iteration for the superiterator,
-    // higher levels of iterator nesting cause higher frequencies of iterator operation.
-
-    // In model generation, level of iterator nesting ordered from least to most is x, y, z.
-    
-    // To calculate the rate of change for a coordinate, one must divide the number of objects in the list by the number of changes to that coordinate in the list.
-    
-    // Becuase z has the highest level of nesting and thus the highest rate of change, z values change for every object in the list A.K.A. the number of objects in the list.
-    // Therefore,
-    // the rate of change for z in the list is the number of objects in the list / the number of objects in the list or just 1.
-    
-    // y, being the superiterator of z, only changes after every iteration of z has been completed.
-    // Therefore,
-    // the rate of change for y in the list is z.
-    
-    // The number of objects in the spatial model is equal to the number of points in the space modelled (maximum structural efficiency).
-    // The number of points in 3D space can be calculated by x * y * z
-    // Therefore,
-    // The rate of change for x in the list is the number of objects in the list / x  A.K.A.  x * y * z / x = y * z
-
-    // The rates of change for a coordinate can be multiplied by their respective coordinates values to determine the minimum ammount into the list that the coordinate triple with that coordinate value must be.
-    // The minimums for each coordinate value can be summed to produce the index in the list at which there exists that coordinate triple
-    
-    // x coordinate value * rate of change of x in list + y coordinate value * rate of change of y in list + z coordinate value * rate of change of z in list
-    // rate of change for z in list = 1
-    // rate of change for y in list = z
-    // rate of change for x in list = y * z
-    // Therefore,
-    // the index in the list for the coordinate triple with given coordinate values = x coordinate value * y * z + y coordinate value * z + z coordinate value
-
-    // That index can be calculated at constant complexity; O(c).
-
-    // The idex can be used to find the object representing the point with a given coordinate triple in a given spatial model (which space? which point?).
-    return spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]];
+    if (spatialModels[model].integer === false) {
+        // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
+        return spatialModels[model][ (coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2] ];
+    } else {
+        // coordinate to be found
+        const xCoor = coordinate[0];
+        // number of changes in model list
+        const xRange = spaceDef[model].x;
+        // rate of change in model list
+        const xRate = spaceDef[model].y * spaceDef[model].z;
+        // number of multiples until match
+        let xMult = 0;
+        // iterate for the number of changes
+        for (let i = 0; i < xRange; i++) {
+            // access model at rate of change
+            if (spatialModels[model][i * xRate].coor[0] === xCoor) {
+                // store number of multiples
+                xMult = i;
+                break;
+            }
+        }
+        
+        // coordinate to be found
+        const yCoor = coordinate[1];
+        // number of changes per x iteration
+        const yRange = spaceDef[model].y;
+        // rate of change in model list
+        const yRate = spaceDef[model].z;
+        // number of multiples until match
+        let yMult = 0;
+        // iterate for the number of changes
+        for (let i = 0; i < yRange; i++) {
+            // access model at rate of change
+            if (spatialModels[model][ (xMult * xRate) + (i * yRate) ].coor[1] === yCoor) {
+                // store number of multiples
+                yMult = i;
+                break;
+            }
+        }
+        
+        // coordinate to be found
+        const zCoor = coordinate[2];
+        // number of changes per y iteration
+        const zRange = spaceDef[model].z;
+        // rate of change in model list = 1 and zMult * 1 = zMult so a variable for zRate is unnecessary
+        // number of multiples until match
+        let zMult = 0;
+        // iterate for the number of changes
+        for (let i = 0; i < zRange; i++) {
+            if (spatialModels[model][ (xMult * xRate) + (yMult * yRate) + i ].coor[2] === zCoor) {
+                zMult = i;
+            }
+        }
+        
+        return spatialModels[model][ (xMult * xRate) + (yMult * yRate) + (zMult) ];
+    }
 };
 
 function openPoint(model, coordinate) {
@@ -183,11 +203,9 @@ function closePoint(model, coordinate) {
     spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]].open = false;
 };
 
-let spatialModels = modelSpaces(spaceDef);
+let spatialModels = generateModels(spaceDef);
 console.log(spatialModels);
-closePoint(1, [3, 2, 1]);
-let coor1 = getPoint(1, [3, 2, 1]);
-console.log(coor1);
+console.log(getPoint(0, [3, 2, 0]));
 
 // OBJECT
 let objectDef = [
