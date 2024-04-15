@@ -5,9 +5,9 @@ Description: Sysmod is tool for designing inventory systems that employs the sim
 
 Each spatial model is an organized list of objects, where each object represents a point in the space modelled.
 
-Their method of generation is three levels of nested iteration (cubic complexity; O(n^3)).
+Their method of generation is three levels of nested iteration (cubic complexity; O(n^3)). This ineffeciency was unfortunately necessary to ensure every point in the spatial model was generated. However, the inefficiency occurs only during model generation, and will not affect operation on the model.
     
-Because a nested iterator must complete all of its iterations before changing the iteration for the superiterator, higher levels of iterator nesting cause higher frequencies of iterator operation. When all the iterators are adding to the same list in their order of operation, their frequency of operation is represented in their frequency in the list.
+Moreover, higher levels of iterator nesting cause higher frequencies of iterator operation, because a nested iterator must complete all of its iterations before changing the iteration for the superiterator, and when all the iterators are adding to the same list in their order of operation, their frequency of operation is represented in their frequency in the spatial model's point list.
 
 In model generation, level of iterator nesting ordered from least to most is x, y, z.
     
@@ -17,9 +17,9 @@ Becuase z has the highest level of nesting and thus the highest rate of change, 
 
 The y coordinate, iterated as the superiterator of z, only changes after every iteration of z has been completed. Therefore, the rate of change for y in the list is z.
     
-The number of objects in the spatial model is equal to the number of points in the space modelled (maximum structural efficiency). The number of points in 3D space can be calculated by x * y * z. Therefore, the rate of change for x in the list is the number of objects in the list / x  A.K.A.  x * y * z / x = y * z.
+The number of objects in the spatial model is equal to the number of points in the space modelled (maximum structural efficiency). The number of points in 3D space can be calculated by x * y * z. Therefore, the rate of change for x in the list is the number of objects in the list / x  A.K.A.  x * y * z / x or just y * z.
 
-The rates of change for a coordinate can be multiplied by their respective coordinates values to determine the minimum ammount into the list that the coordinate triple with that coordinate value must be. The minimums for each coordinate value can be summed to produce the index in the list at which there exists that coordinate triple.
+The rates of change for a coordinate can be multiplied by their respective coordinates values to determine the minimum ammount into the list that the coordinate triple with that coordinate value must be. The minimum idexes for each coordinate value can be summed to produce the index in the list at which there exists that coordinate triple.
 
 id est:
 x coordinate value * rate of change of x in list + y coordinate value * rate of change of y in list + z coordinate value * rate of change of z in list
@@ -34,3 +34,5 @@ NOTE: This solution only works for positive/non-integer spatial models, because 
 NOTE: This solution works at constant complexity ( O(n) ) making it the choice solution for object rendering in positive space for its maximal efficiency.
 
 For integer spatial models, a different solution is needed.
+
+The sum of the dimensional ranges x, y, and z is equal to the number of iterations necessary to find any given coordinate triple in integer spatial models.

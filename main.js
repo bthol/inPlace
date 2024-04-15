@@ -3,7 +3,7 @@
 // II.      definitions are used to generate spatial models in a separate spatialModels structure
 // III.     Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
 
-//  SPACE
+// Data Structures for Spatial Models
 let spaceDef = [
     {
         id: "space-1",
@@ -34,6 +34,8 @@ let spaceDef = [
     //     obstruct : [],
     // },
 ];
+
+let spatialModels;
 
 function generateModels(spaceDef) {
     let spaces = [];
@@ -135,79 +137,120 @@ function generateModels(spaceDef) {
     }
     return spaces;
 };
+spatialModels = generateModels(spaceDef);
 
-function getPoint(model, coordinate) {
-    if (spatialModels[model].integer === false) {
-        // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
-        return spatialModels[model][ (coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2] ];
+// Spatial Model Operations
+function getPointIndex(model, coordinate) {
+    // validate arguments
+    let argValid = false;
+    let integerSpace = false;
+    // tests if argument for model parameter is within the valid range
+    if (model >= 0 && model <= spatialModels.length - 1) {
+        // tests for integer space
+        if (spatialModels[model].integer === false) {
+            // tests if argument for coordinate parameter is within valid range for positive space
+            if (coordinate[0] >= 0 && coordinate[0] < spaceDef[model].x && coordinate[1] >= 0 && coordinate[1] < spaceDef[model].y && coordinate[2] >= 0 && coordinate[2] < spaceDef[model].z) {
+                argValid = true;
+            } else {
+                console.log(`No such point in ${spaceDef[model].id}!`);
+            }
+        } else {
+            integerSpace = true;
+            // tests if argument for coordinate parameter is within valid range for integer space
+            if (coordinate[0] >= -(Math.ceil(spaceDef[model].x / 2)) + 1 && coordinate[0] < Math.floor(spaceDef[model].x / 2) + 1 && coordinate[1] >= -(Math.ceil(spaceDef[model].y / 2)) + 1 && coordinate[1] < Math.floor(spaceDef[model].y / 2) + 1 && coordinate[2] >= -(Math.ceil(spaceDef[model].z / 2)) + 1 && coordinate[2] < Math.floor(spaceDef[model].z / 2) + 1) {
+                argValid = true;
+            } else {
+                console.log(`No such point in ${spaceDef[model].id}!`);
+            }
+        }
+
+        
     } else {
-        // coordinate to be found
-        const xCoor = coordinate[0];
-        // number of changes in model list
-        const xRange = spaceDef[model].x;
-        // rate of change in model list
-        const xRate = spaceDef[model].y * spaceDef[model].z;
-        // number of multiples until match
-        let xMult = 0;
-        // iterate for the number of changes
-        for (let i = 0; i < xRange; i++) {
-            // access model at rate of change
-            if (spatialModels[model][i * xRate].coor[0] === xCoor) {
-                // store number of multiples
-                xMult = i;
-                break;
+        // model parameter is outside valid range
+        console.log("No such model by that parameter!");
+    }
+
+    if (argValid) {
+        if (!integerSpace) {
+            // positive space single point access
+            // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
+            return (coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2];
+        } else {
+            // integer space single point access
+            // coordinate to be found
+            const xCoor = coordinate[0];
+            // number of changes in model list
+            const xRange = spaceDef[model].x;
+            // rate of change in model list
+            const xRate = spaceDef[model].y * spaceDef[model].z;
+            // number of multiples until match
+            let xMult = 0;
+            // iterate for the number of changes
+            for (let i = 0; i < xRange; i++) {
+                // access model at rate of change
+                if (spatialModels[model][i * xRate].coor[0] === xCoor) {
+                    // store number of multiples
+                    xMult = i;
+                    break;
+                }
             }
-        }
-        
-        // coordinate to be found
-        const yCoor = coordinate[1];
-        // number of changes per x iteration
-        const yRange = spaceDef[model].y;
-        // rate of change in model list
-        const yRate = spaceDef[model].z;
-        // number of multiples until match
-        let yMult = 0;
-        // iterate for the number of changes
-        for (let i = 0; i < yRange; i++) {
-            // access model at rate of change
-            if (spatialModels[model][ (xMult * xRate) + (i * yRate) ].coor[1] === yCoor) {
-                // store number of multiples
-                yMult = i;
-                break;
+            // console.log(spatialModels[model][(xMult * xRate)].coor);
+            
+            // coordinate to be found
+            const yCoor = coordinate[1];
+            // number of changes per x iteration
+            const yRange = spaceDef[model].y;
+            // rate of change in model list
+            const yRate = spaceDef[model].z;
+            // number of multiples until match
+            let yMult = 0;
+            // iterate for the number of changes
+            for (let i = 0; i < yRange; i++) {
+                // access model at rate of change
+                if (spatialModels[model][ (xMult * xRate) + (i * yRate) ].coor[1] === yCoor) {
+                    // store number of multiples
+                    yMult = i;
+                    break;
+                }
             }
-        }
-        
-        // coordinate to be found
-        const zCoor = coordinate[2];
-        // number of changes per y iteration
-        const zRange = spaceDef[model].z;
-        // rate of change in model list = 1 and zMult * 1 = zMult so a variable for zRate is unnecessary
-        // number of multiples until match
-        let zMult = 0;
-        // iterate for the number of changes
-        for (let i = 0; i < zRange; i++) {
-            if (spatialModels[model][ (xMult * xRate) + (yMult * yRate) + i ].coor[2] === zCoor) {
-                zMult = i;
+            // console.log(spatialModels[model][(xMult * xRate) + (yMult * yRate)].coor);
+            
+            // coordinate to be found
+            const zCoor = coordinate[2];
+            // number of changes per y iteration
+            const zRange = spaceDef[model].z;
+            // rate of change in model list = 1 and zMult * 1 = zMult so a variable for zRate is unnecessary
+            // number of multiples until match
+            let zMult = 0;
+            // iterate for the number of changes
+            for (let i = 0; i < zRange; i++) {
+                if (spatialModels[model][ (xMult * xRate) + (yMult * yRate) + i ].coor[2] === zCoor) {
+                    zMult = i;
+                }
             }
+            // console.log(spatialModels[model][ (xMult * xRate) + (yMult * yRate) + (zMult) ].coor);
+            return (xMult * xRate) + (yMult * yRate) + (zMult);
         }
-        
-        return spatialModels[model][ (xMult * xRate) + (yMult * yRate) + (zMult) ];
     }
 };
 
+function readPoint(model, coordinate) {
+    return spatialModels[model][getPointIndex(model, coordinate)];
+};
+
 function openPoint(model, coordinate) {
-    spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]].open = true;
+    spatialModels[model][getPointIndex(model, coordinate)].open = true;
 };
 
 function closePoint(model, coordinate) {
-    spatialModels[model][(coordinate[0] * spaceDef[model].y * spaceDef[model].z) + (coordinate[1] * spaceDef[model].z) + coordinate[2]].open = false;
+    spatialModels[model][getPointIndex(model, coordinate)].open = false;
 };
 
-let spatialModels = generateModels(spaceDef);
-console.log(spatialModels);
-console.log(getPoint(0, [3, 2, 0]));
+// closePoint(1, [1, 0, -1]);
+console.log(readPoint(0, [1, 0, -10]));
+// openPoint(1, [1, 0, -1]);
+// console.log(readPoint(1, [1, 0, -1]));
 
-// OBJECT
 let objectDef = [
     {
         x: 1,
