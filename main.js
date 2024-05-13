@@ -198,7 +198,13 @@ function getPointIndex(spaceID, spaceIndex, coordinate) {
     let integerSpace = false;
     let model;
     // tests if argument for spaceID parameter is within the valid range
-    if (spaceID >= 0 && spaceID < spaces.length) {
+    let isModel = false;
+    for (let i = 0; i < spaces.length; i++) {
+        if (spaces[i].spaceID === spaceID) {
+            isModel = true;
+        }
+    }
+    if (isModel) {
         // gets model for reference
         for (let i = 0; i < spaceDef.length; i++) {
             if (spaceDef[i].modelID === spaces[spaceIndex].modelID) {
@@ -206,7 +212,7 @@ function getPointIndex(spaceID, spaceIndex, coordinate) {
             }
         }
         // tests for integer space
-        if (spaces[spaceID].integer === false) {
+        if (spaces[spaceIndex].integer === false) {
             // tests if argument for coordinate parameter is within valid range for positive space
             if (coordinate[0] >= 0 && coordinate[0] < model.x && coordinate[1] >= 0 && coordinate[1] < model.y && coordinate[2] >= 0 && coordinate[2] < model.z) {
                 argValid = true;
@@ -326,10 +332,10 @@ function closePoint(spaceID, coordinate) {
 };
 
 // procecss
-closePoint(0, [1, 2, -3]);
-console.log(readPoint(0, [1, 2, -3]));
-openPoint(0, [1, 2, -3]);
-console.log(readPoint(0, [1, 2, -3]));
+closePoint("a", [1, 2, -3]);
+console.log(readPoint("a", [1, 2, -3]));
+openPoint("a", [1, 2, -3]);
+console.log(readPoint("a", [1, 2, -3]));
 
 // Defintion of object models
 // resources
