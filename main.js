@@ -3,27 +3,51 @@
 // II.      definitions are used to generate spatial models in a separate spatialModels structure.
 // III.     Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
 
-// System of Identification
-let lastModelID = -1;
-function generateModelID() {
-    const id = lastModelID + 1;
-    lastModelID += 1;
-    return id;
-};
+// Organizaztional Note: Each section is titled, and under under each title is a subsection for resources and below that a subsection for the process that uses those resources.
 
-let lastSpaceID = -1;
-function generateSpaceID() {
-    const id = lastSpaceID + 1;
-    lastSpaceID += 1;
+// System of Identification
+let modelIDindex = [0];
+let spaceIDindex = [0];
+// 27 letters + 10 numbers = 37 total number of characters
+const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+function generateID(structure) {
+    // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
+    // compile ID string using current state of index structure
+    let id = '';
+    for (let i = 0; i < structure.length; i++) {
+        // next character id string
+        id += characters[structure[i]];
+    }
+    // update state of index structure for next ID
+    for (let i = 0; i < structure.length; i++) {
+        // update index structure for next id
+        if (structure[i] < characters.length - 1) {
+            // set to next character to complete update
+            structure[i] = structure[i] + 1;
+            break;
+        } else if (i === structure.length - 1) {
+            // if at last character in characters and last iteration of string
+            // reset to all values to zero
+            for (let i = 0; i < structure.length; i++) {structure[i] = 0};
+            // add another character to string
+            structure.push(0);
+            break;
+        } else {
+            // set to first character and iterate to next
+            structure[i] = 0;
+        }
+    }
+    
     return id;
 };
 
 // Defintion of Spatial Models
+// resources
 let spaceDef = [];
 
 function defineSpatialModel(name, x, y, z, integer, octant) {
     let model = {};
-    model.modelID = generateModelID();
+    model.modelID = generateID(modelIDindex);
     model.instances = 0;
     model.integer = integer;
     model.modelName = name;
@@ -41,10 +65,12 @@ function defineSpatialModel(name, x, y, z, integer, octant) {
     spaceDef.push(model);
 };
 
+// process
 defineSpatialModel("space-1", 10, 10, 10, true, true);
 defineSpatialModel("space-2", 8, 6, 4, false, false);
 
 // Live Spaces
+// resources
 let spaces = [];
 
 function generateSpace(modelID) {
@@ -148,7 +174,7 @@ function generateSpace(modelID) {
         }
     }
     mod.instances += 1;
-    spaces.push({space: space, modelID: mod.modelID, spaceID: generateSpaceID()});
+    spaces.push({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDindex)});
 };
 
 function generateSpacePerModel() {
@@ -158,12 +184,14 @@ function generateSpacePerModel() {
     }
 };
 
+// process
 generateSpacePerModel();
 generateSpace(spaceDef[0].modelID);
 console.log(spaceDef);
 console.log(spaces);
 
 // Spatial Model Operations
+// resources
 function getPointIndex(spaceID, spaceIndex, coordinate) {
     // validate arguments
     let argValid = false;
@@ -297,31 +325,29 @@ function closePoint(spaceID, coordinate) {
     spaces[spaceIndex].space[getPointIndex(spaceID, spaceIndex, coordinate)].open = false;
 };
 
+// procecss
 closePoint(0, [1, 2, -3]);
 console.log(readPoint(0, [1, 2, -3]));
-// openPoint(0, [1, 2, -3]);
-// console.log(readPoint(0, [1, 2, -3]));
+openPoint(0, [1, 2, -3]);
+console.log(readPoint(0, [1, 2, -3]));
 
-let objectDef = [
-    {
-        x: 1,
-        y: 1,
-        z: 1,
-        name: "object_1",
-        quantity: 2,
-    },
-    {
-        x: 5,
-        y: 5,
-        z: 5,
-        name: "object_2",
-        quantity: 1,
-    },
-];
+// Defintion of object models
+// resources
+let objectDef = [];
 
-function modelObjects(objectDef) {
-
+function defineObjectModel(name, x, y, z, quantity) {
+    let mod = {};
+    mod.x = x;
+    mod.y = y;
+    mod.z = z;
+    mod.objectName = name;
+    mod.quantity = quantity;
+    objectDef.push(mod);
 };
+
+// process
+defineObjectModel("object-1", 1, 1, 1, 2);
+defineObjectModel("object-2", 5, 5, 5, 1);
 
 // Document Object Model selections
 const panel = document.body.querySelector('#control-panel');
@@ -333,8 +359,6 @@ const spaceFormContainer = formModel.querySelector('#space-form-container');
 const obstructContainer = formModel.querySelector('#obstructions');
 
 const objectContainer = formModel.querySelector('#object-form-container');
-
-
 
 
 
