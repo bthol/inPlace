@@ -6,8 +6,9 @@
 // Organizaztional Note: Each section is titled, and under under each title is a subsection for resources and below that a subsection for the process that uses those resources.
 
 // System of Identification
-let modelIDindex = [0];
-let spaceIDindex = [0];
+let modelIDstructure = [0];
+let spaceIDstructure = [0];
+let objectIDstructure = [0];
 // 27 letters + 10 numbers = 37 total number of characters
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 function generateID(structure) {
@@ -45,9 +46,9 @@ function generateID(structure) {
 // resources
 let spaceDef = [];
 
-function defineSpatialModel(name, x, y, z, integer, octant) {
+function defineSpatialModel(name, x, y, z, integer = false, octant = false) {
     let model = {};
-    model.modelID = generateID(modelIDindex);
+    model.modelID = generateID(modelIDstructure);
     model.instances = 0;
     model.integer = integer;
     model.modelName = name;
@@ -65,23 +66,64 @@ function defineSpatialModel(name, x, y, z, integer, octant) {
     spaceDef.push(model);
 };
 
+function getModelIndex(modelID) {
+    // search for model index by modelID
+    let modelIndex = undefined;
+    for (let i = 0; i < spaceDef.length; i++) {
+        if (spaceDef[i].modelID === modelID) {
+            modelIndex = i;
+            break;
+        }
+    }
+    if (modelIndex === undefined) {
+        return console.log(`No such model by the modelID "${modelID}"!`);
+    } else {
+        return modelIndex;
+    }
+};
+
+function validCoor(modelID, x, y, z) {
+    const model = spaceDef[getModelIndex(modelID)];
+    if (model.integer === false) {
+        // non integer space
+        if (x >= 0 && x < model.x && y >= 0 && y < model.y && z >= 0 && z < model.z) {
+            // if each coordinate value satasfies the range for that dimension in the model
+            return true;
+        } else {
+            console.log(`No such coordinate in ${model.modelName}!`);
+            return false;
+        }
+    } else {
+        // integer space
+        if (x >= -(Math.ceil(model.x / 2)) + 1 && x < Math.floor(model.x / 2) + 1 && y >= -(Math.ceil(model.y / 2)) + 1 && y < Math.floor(model.y / 2) + 1 && z >= -(Math.ceil(model.z / 2)) + 1 && z < Math.floor(model.z / 2) + 1) {
+            // if each coordinate value satasfies the range for that dimension in the model
+            return true;
+        } else {
+            console.log(`No such coordinate in ${model.modelName}!`);
+            return false;
+        }
+    }
+};
+
+function addObstruct(modelID, x, y, z) {
+    if (validCoor(modelID, x, y, z)) {
+        const obstruction = [x, y, z];
+        spaceDef[getModelIndex(modelID)].obstruct.push(obstruction);
+    }
+};
+
 // process
 defineSpatialModel("space-1", 10, 10, 10, true, true);
-defineSpatialModel("space-2", 8, 6, 4, false, false);
+defineSpatialModel("space-2", 8, 6, 4);
 
 // Live Spaces
 // resources
 let spaces = [];
 
 function generateSpace(modelID) {
-    // find index of defintion with modelID
-    let mod;
-    for (let i = 0; i < spaceDef.length; i++) {
-        if (spaceDef[i].modelID === modelID) {
-            mod = spaceDef[i];
-        }
-    }
-    // generate an space from the model
+    // get model for reference using the modelID
+    const mod = spaceDef[getModelIndex(modelID)];
+    // generate a space from the model
     let space = [];
     if (mod.integer === false) {
 
@@ -174,13 +216,29 @@ function generateSpace(modelID) {
         }
     }
     mod.instances += 1;
-    spaces.push({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDindex)});
+    spaces.push({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDstructure)});
 };
 
 function generateSpacePerModel() {
     // generate single instance of each spatial model defintion
     for (let i = 0; i < spaceDef.length; i++) {
         generateSpace(spaceDef[i].modelID);
+    }
+};
+
+function getSpaceIndex(spaceID) {
+    // search for space index by modelID
+    let spaceIndex = undefined;
+    for (let i = 0; i < spaceDef.length; i++) {
+        if (spaces[i].spaceID === spaceID) {
+            spaceIndex = i;
+            break;
+        }
+    }
+    if (spaceIndex === undefined) {
+        return console.log(`No such space by the spaceID "${spaceID}"!`);
+    } else {
+        return spaceIndex;
     }
 };
 
@@ -192,49 +250,10 @@ console.log(spaces);
 
 // Spatial Model Operations
 // resources
-function getPointIndex(spaceID, spaceIndex, coordinate) {
-    // validate arguments
-    let argValid = false;
-    let integerSpace = false;
-    let model;
-    // tests if argument for spaceID parameter is within the valid range
-    let isModel = false;
-    for (let i = 0; i < spaces.length; i++) {
-        if (spaces[i].spaceID === spaceID) {
-            isModel = true;
-        }
-    }
-    if (isModel) {
-        // gets model for reference
-        for (let i = 0; i < spaceDef.length; i++) {
-            if (spaceDef[i].modelID === spaces[spaceIndex].modelID) {
-                model = spaceDef[i];
-            }
-        }
-        // tests for integer space
-        if (spaces[spaceIndex].integer === false) {
-            // tests if argument for coordinate parameter is within valid range for positive space
-            if (coordinate[0] >= 0 && coordinate[0] < model.x && coordinate[1] >= 0 && coordinate[1] < model.y && coordinate[2] >= 0 && coordinate[2] < model.z) {
-                argValid = true;
-            } else {
-                console.log(`No such point in ${model.modelName}!`);
-            }
-        } else {
-            integerSpace = true;
-            // tests if argument for coordinate parameter is within valid range for integer space
-            if (coordinate[0] >= -(Math.ceil(model.x / 2)) + 1 && coordinate[0] < Math.floor(model.x / 2) + 1 && coordinate[1] >= -(Math.ceil(model.y / 2)) + 1 && coordinate[1] < Math.floor(model.y / 2) + 1 && coordinate[2] >= -(Math.ceil(model.z / 2)) + 1 && coordinate[2] < Math.floor(model.z / 2) + 1) {
-                argValid = true;
-            } else {
-                console.log(`No such point in ${model.modelName}!`);
-            }
-        }
-    } else {
-        // model parameter is outside valid range
-        console.log("No such model by that parameter!");
-    }
-
-    if (argValid) {
-        if (!integerSpace) {
+function getPointIndex(spaceID, spaceIndex = getSpaceIndex(spaceID), coordinate) {
+    const model = spaceDef[getModelIndex(spaces[spaceIndex].modelID)];
+    if (validCoor(model.modelID, coordinate[0], coordinate[1], coordinate[2])) {
+        if (!model.integer) {
             // positive/non-integer space single point access
             // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
             return (coordinate[0] * model.y * model.z) + (coordinate[1] * model.z) + coordinate[2];
@@ -299,13 +318,8 @@ function getPointIndex(spaceID, spaceIndex, coordinate) {
 };
 
 function readPoint(spaceID, coordinate) {
-    let spaceIndex;
-    for (let i = 0; i < spaces.length; i++) {
-        if (spaces[i].spaceID === spaceID) {
-            spaceIndex = i;
-            break;
-        }
-    }
+    // single point access
+    const spaceIndex = getSpaceIndex(spaceID);
     return spaces[spaceIndex].space[getPointIndex(spaceID, spaceIndex, coordinate)];
 };
 
@@ -354,6 +368,7 @@ function defineObjectModel(name, x, y, z, quantity) {
 // process
 defineObjectModel("object-1", 1, 1, 1, 2);
 defineObjectModel("object-2", 5, 5, 5, 1);
+console.log(objectDef);
 
 // Document Object Model selections
 const panel = document.body.querySelector('#control-panel');
