@@ -401,6 +401,10 @@ function defineObjectModel(name, x, y, z, quantity) {
 // console.log(objectDef);
 
 /////////////////// DISPLAY ///////////////////
+function removeObstruct(e) {
+    e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
+};
+
 function addObstruct(e) {
     // build a new obstruction
     const obstruct = document.createElement('div');
@@ -444,6 +448,15 @@ function addObstruct(e) {
     z.setAttribute('placeholder', "Quantity of Z dimension");
     z.setAttribute('required', true);
 
+    const container = document.createElement('div');
+    container.setAttribute('class', 'center-flex');
+
+    const removeBTN = document.createElement('button');
+    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
+    removeBTN.setAttribute('type', 'button');
+    removeBTN.innerText = "remove";
+    removeBTN.addEventListener('click', removeObstruct);
+    
     // assemble components
     obstruct.appendChild(labelX);
     obstruct.appendChild(x);
@@ -451,6 +464,8 @@ function addObstruct(e) {
     obstruct.appendChild(y);
     obstruct.appendChild(labelZ);
     obstruct.appendChild(z);
+    container.appendChild(removeBTN);
+    obstruct.appendChild(container);
 
     // append built obstruction form to the space form containing the selected button
     e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);

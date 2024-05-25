@@ -161,3 +161,7 @@ input[type="range"] {
     background-color: hsl(50, 92%, 50%);
     border: 2.3px solid #4d4d4d;
 }
+
+.removeBTN-layout {
+    margin-top: 15px;
+}
