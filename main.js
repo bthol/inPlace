@@ -1,14 +1,21 @@
 // The Programic Process
-// I.       user interacts with forms in interface to establish defintions of space in spaceDef structure.
-// II.      definitions are used to generate spatial models in a separate spatialModels structure.
-// III.     Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
+// I.       Data within forms in interface is used to establish spatial and object defintions in respective structures.
+// II.      Definitions are used to generate model instances with which interactions are possible.
+// III.     Interactions with a model represent the model object(s) moving through model space(s).
+// IV.      Simulations are procedures for how model objects move through model spaces.
+
+// Programic Organization
+// I.   Model
+// II.  process
+// III. Display
 
 /////////////////// DOM ///////////////////
 const panel = document.body.querySelector('#control-panel');
 const formModel = panel.querySelector('#model-parameters');
+const formControls = panel.querySelector('#playback-controls');
+const formVisual = panel.querySelector('#visualization-parameters');
 const spaceFormContainer = formModel.querySelector('#space-form-container');
 const objectFormContainer = formModel.querySelector('#object-form-container');
-const formControls = panel.querySelector('#playback-controls');
 
 // onload buttons
 const addSpaceBTN = panel.querySelector('#btn-add-space');
@@ -23,9 +30,7 @@ let spaceIDstructure = [0];
 let objectIDstructure = [0];
 let spaceFormIDstructure = [1];
 let objectFormIDstructure = [1];
-
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-
 function generateID(structure) {
     // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
     // compile ID string using current state of index structure
@@ -65,9 +70,13 @@ function getIDfromStructure(structure) {
     return id;
 };
 
-// Defintion of Spatial Models
+// Data Structures
 let spaceDef = [];
+let spaces = [];
+let objectDef = [];
+let objects = [];
 
+// Defintion of Spatial Models
 function defineSpatialModel(name, x, y, z, integer = false, octant = false, obstruct) {
     let model = {};
     model.modelID = generateID(modelIDstructure);
@@ -127,9 +136,6 @@ function validCoor(modelID, x, y, z) {
     }
 };
 
-// defineSpatialModel("space-1", 10, 10, 10, true, true, []);
-// defineSpatialModel("space-2", 8, 6, 4, []);
-
 function generateSpatialModels() {
     // run defineSpatialModel for every space form
     spaceFormContainer.querySelectorAll('.space-form').forEach((form) => {
@@ -170,11 +176,9 @@ function generateSpatialModels() {
         defineSpatialModel(name, x, y, z, integer, octant, obstruct);
     });
 };
-generateSpatialModels();
+// generateSpatialModels();
 
 // Live Spaces
-let spaces = [];
-
 function generateSpace(modelID) {
     // get model for reference using the modelID
     const mod = spaceDef[getModelIndex(modelID)];
@@ -297,11 +301,6 @@ function getSpaceIndex(spaceID) {
     }
 };
 
-// generateSpace(spaceDef[0].modelID);
-generateSpacePerModel();
-console.log(spaceDef);
-console.log(spaces);
-
 // Spatial Model Operations
 function getPointIndex(spaceID, coordinate, spaceIndex = getSpaceIndex(spaceID)) {
     const model = spaceDef[getModelIndex(spaces[spaceIndex].modelID)];
@@ -386,14 +385,7 @@ function closePoint(spaceID, coordinate) {
     spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)].open = false;
 };
 
-// closePoint("a", [1, 2, -3]);
-// console.log(readPoint("a", [1, 2, -3]));
-// openPoint("a", [1, 2, -3]);
-// console.log(readPoint("a", [1, 2, -3]));
-
 // Defintion of object models
-let objectDef = [];
-
 function defineObjectModel(name, x, y, z, quantity) {
     let mod = {};
     mod.x = x;
@@ -405,15 +397,26 @@ function defineObjectModel(name, x, y, z, quantity) {
     objectDef.push(mod);
 };
 
-// defineObjectModel("object-1", 1, 1, 1, 2);
-// defineObjectModel("object-2", 2, 5, 3, 1);
-// console.log(objectDef);
+/////////////////// PROCESS ///////////////////
+
+defineSpatialModel("space-1", 10, 10, 10, true, true, []);
+defineSpatialModel("space-2", 8, 6, 4, []);
+
+generateSpace(spaceDef[0].modelID);
+generateSpacePerModel();
+console.log(spaceDef);
+console.log(spaces);
+
+closePoint("a", [1, 2, -3]);
+console.log(readPoint("a", [1, 2, -3]));
+openPoint("a", [1, 2, -3]);
+console.log(readPoint("a", [1, 2, -3]));
+
+defineObjectModel("object-1", 1, 1, 1, 2);
+defineObjectModel("object-2", 2, 5, 3, 1);
+console.log(objectDef);
 
 /////////////////// DISPLAY ///////////////////
-function removeForm(e) {
-    e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
-};
-
 // form component functions
 function removeBTNComponent(text, addClass='') {
     // create
@@ -424,7 +427,7 @@ function removeBTNComponent(text, addClass='') {
     removeBTN.setAttribute('class', `button-style-1 btn-add-obstruct ${addClass}`);
     removeBTN.setAttribute('type', 'button');
     removeBTN.innerText = `${text}`;
-    removeBTN.addEventListener("click", (e) => {removeForm(e)});
+    removeBTN.addEventListener("click", (e) => {e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode)});
 
     // assemble
     removeBTNcontainer.appendChild(removeBTN);
@@ -733,7 +736,6 @@ function addObjectForm() {
     objectFormContainer.appendChild(form);
 };
 
-const formVisual = panel.querySelector('#visualization-parameters');
 // Slider Logic
 function sliderInitPercent(sliderID, outputID) {
     // select from Document Object Model
