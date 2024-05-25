@@ -3,13 +3,19 @@
 // II.      definitions are used to generate spatial models in a separate spatialModels structure.
 // III.     Interactions with each model are made possible by getPoint, openPoint and closePoint functions.
 
-// Organizaztional Note: Each section is titled, and under under each title is a subsection for resources and below that a subsection for the process that uses those resources.
+/////////////////// DOM ///////////////////
+const panel = document.body.querySelector('#control-panel');
+const formModel = panel.querySelector('#model-parameters');
+const spaceFormContainer = formModel.querySelector('#space-form-container');
+const objectContainer = formModel.querySelector('#object-form-container');
+const formControls = panel.querySelector('#playback-controls');
 
+/////////////////// MODEL ///////////////////
 // System of Identification
 let modelIDstructure = [0];
+let obstructIDstructure = [0];
 let spaceIDstructure = [0];
 let objectIDstructure = [0];
-// 27 letters + 10 numbers = 37 total number of characters
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 function generateID(structure) {
     // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
@@ -42,17 +48,24 @@ function generateID(structure) {
     return id;
 };
 
+function getIDfromStructure(structure) {
+    let id = "";
+    for (let i = 0; i < structure.length; i++) {
+        id += characters[structure[i]];
+    }
+    return id;
+};
+
 // Defintion of Spatial Models
-// resources
 let spaceDef = [];
 
-function defineSpatialModel(name, x, y, z, integer = false, octant = false) {
+function defineSpatialModel(name, x, y, z, integer = false, octant = false, obstruct) {
     let model = {};
     model.modelID = generateID(modelIDstructure);
     model.instances = 0;
     model.integer = integer;
     model.modelName = name;
-    model.obstruct = [];
+    model.obstruct = obstruct;
     model.x = x;
     model.y = y;
     model.z = z;
@@ -105,19 +118,52 @@ function validCoor(modelID, x, y, z) {
     }
 };
 
-function addObstruct(modelID, x, y, z) {
-    if (validCoor(modelID, x, y, z)) {
-        const obstruction = [x, y, z];
-        spaceDef[getModelIndex(modelID)].obstruct.push(obstruction);
-    }
-};
+// defineSpatialModel("space-1", 10, 10, 10, true, true, []);
+// defineSpatialModel("space-2", 8, 6, 4, []);
 
-// process
-defineSpatialModel("space-1", 10, 10, 10, true, true);
-defineSpatialModel("space-2", 8, 6, 4);
+function generateSpatialModels() {
+    // run defineSpatialModel for every space form
+    spaceFormContainer.querySelectorAll('.space-form').forEach((form) => {
+        // get information from form
+        const name = form.querySelector('.nameSpace').value;
+        const x = form.querySelector('.Xdimension').value;
+        const y = form.querySelector('.Ydimension').value;
+        const z = form.querySelector('.Zdimension').value;
+        let integer;
+        form.querySelectorAll('.integer').forEach((option) => {
+            if (option.checked === true) {
+                if (option.value === "true") {
+                    integer = true;
+                } else {
+                    integer = false;
+                }
+            }
+        });
+        let octant;
+        form.querySelectorAll('.octant').forEach((option) => {
+            if (option.checked === true) {
+                if (option.value === "true") {
+                    octant = true;
+                } else {
+                    octant = false;
+                }
+            }
+        });
+        // obstructions
+        let obstruct = [];
+        form.querySelectorAll('.obstruction').forEach((o) => {
+            const x = o.querySelector('.Xdimension').value;
+            const y = o.querySelector('.Ydimension').value;
+            const z = o.querySelector('.Zdimension').value;
+            obstruct.push([x, y, z]);
+        });
+        // pass info as arguments into defineSpatialModels function
+        defineSpatialModel(name, x, y, z, integer, octant, obstruct);
+    });
+};
+generateSpatialModels();
 
 // Live Spaces
-// resources
 let spaces = [];
 
 function generateSpace(modelID) {
@@ -242,15 +288,13 @@ function getSpaceIndex(spaceID) {
     }
 };
 
-// process
+// generateSpace(spaceDef[0].modelID);
 generateSpacePerModel();
-generateSpace(spaceDef[0].modelID);
 console.log(spaceDef);
 console.log(spaces);
 
 // Spatial Model Operations
-// resources
-function getPointIndex(spaceID, spaceIndex = getSpaceIndex(spaceID), coordinate) {
+function getPointIndex(spaceID, coordinate, spaceIndex = getSpaceIndex(spaceID)) {
     const model = spaceDef[getModelIndex(spaces[spaceIndex].modelID)];
     if (validCoor(model.modelID, coordinate[0], coordinate[1], coordinate[2])) {
         if (!model.integer) {
@@ -320,39 +364,25 @@ function getPointIndex(spaceID, spaceIndex = getSpaceIndex(spaceID), coordinate)
 function readPoint(spaceID, coordinate) {
     // single point access
     const spaceIndex = getSpaceIndex(spaceID);
-    return spaces[spaceIndex].space[getPointIndex(spaceID, spaceIndex, coordinate)];
+    return spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)];
 };
 
 function openPoint(spaceID, coordinate) {
-    let spaceIndex;
-    for (let i = 0; i < spaces.length; i++) {
-        if (spaces[i].spaceID === spaceID) {
-            spaceIndex = i;
-            break;
-        }
-    }
-    spaces[spaceIndex].space[getPointIndex(spaceID, spaceIndex, coordinate)].open = true;
+    const spaceIndex = getSpaceIndex(spaceID);
+    spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)].open = true;
 };
 
 function closePoint(spaceID, coordinate) {
-    let spaceIndex;
-    for (let i = 0; i < spaces.length; i++) {
-        if (spaces[i].spaceID === spaceID) {
-            spaceIndex = i;
-            break;
-        }
-    }
-    spaces[spaceIndex].space[getPointIndex(spaceID, spaceIndex, coordinate)].open = false;
+    const spaceIndex = getSpaceIndex(spaceID);
+    spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)].open = false;
 };
 
-// procecss
-closePoint("a", [1, 2, -3]);
-console.log(readPoint("a", [1, 2, -3]));
-openPoint("a", [1, 2, -3]);
-console.log(readPoint("a", [1, 2, -3]));
+// closePoint("a", [1, 2, -3]);
+// console.log(readPoint("a", [1, 2, -3]));
+// openPoint("a", [1, 2, -3]);
+// console.log(readPoint("a", [1, 2, -3]));
 
 // Defintion of object models
-// resources
 let objectDef = [];
 
 function defineObjectModel(name, x, y, z, quantity) {
@@ -361,78 +391,74 @@ function defineObjectModel(name, x, y, z, quantity) {
     mod.y = y;
     mod.z = z;
     mod.objectName = name;
+    mod.objectID = generateID(objectIDstructure);
     mod.quantity = quantity;
     objectDef.push(mod);
 };
 
-// process
-defineObjectModel("object-1", 1, 1, 1, 2);
-defineObjectModel("object-2", 5, 5, 5, 1);
-console.log(objectDef);
+// defineObjectModel("object-1", 1, 1, 1, 2);
+// defineObjectModel("object-2", 2, 5, 3, 1);
+// console.log(objectDef);
 
-// Document Object Model selections
-const panel = document.body.querySelector('#control-panel');
-
-// Model Parameters
-const formModel = panel.querySelector('#model-parameters');
-
-const spaceFormContainer = formModel.querySelector('#space-form-container');
-const obstructContainer = formModel.querySelector('#obstructions');
-
-const objectContainer = formModel.querySelector('#object-form-container');
-
-
-
-// //////////// ADDDDD OBstructioninoinoinoinoin!!!!
-
-
-
-
-let obstructID = 0;
-function addObstruct(spaceFormID) {
-    console.log(spaceFormID);
-    const form = document.createElement('form');
-    form.setAttribute('action', './');
-    form.setAttribute('method', 'POST');
-    form.setAttribute('name', 'obstruct-form');
-    form.setAttribute('class', `obstruct-form`);
-    form.setAttribute('id', `obstruct-form-${obstructID}`);
-    const formID = `obstruct-form-${obstructID}`;
+/////////////////// DISPLAY ///////////////////
+function addObstruct(e) {
+    // build a new obstruction
+    const obstruct = document.createElement('div');
+    obstruct.setAttribute('class', 'obstruction form-layout-block');
+    obstruct.setAttribute('id', `obstruct-${generateID(obstructIDstructure)}`);
     
-    const formLabel = document.createElement('label');
-    formLabel.setAttribute('for', 'obstruct-form');
-    formLabel.innerText = "Obstruction ";
-    
-    const xMax = spaceFormContainer.querySelector(`#space-form-${spaceFormID}`);
-    console.log(xMax);
-    
-    const inputX = document.createElement('input');
-    inputX.setAttribute('name', 'inputX');
-    inputX.setAttribute('class', 'inputX');
-    inputX.setAttribute('type', 'number');
-    inputX.setAttribute('placeholder', 'quantity of X dimension');
-    inputX.setAttribute('min', '1');
-    inputX.setAttribute('max', `${parameters.columns.value}`);
-    inputX.style.width = "50px";
-    
-    const deleteFormButton = document.createElement('button');
-    deleteFormButton.setAttribute('type', 'button');
-    deleteFormButton.setAttribute('name', "deleteFormButton");
-    deleteFormButton.innerText = "remove";
-    listenRemoveForm(deleteFormButton, formID);
-    
-    form.appendChild(formLabel);
-    form.appendChild(inputX);
-    form.appendChild(deleteFormButton);
-    obstructContainer.appendChild(form);
+    // create components
+    const labelX = document.createElement('label');
+    labelX.setAttribute('for', 'Xdimension');
 
-    obstructID += 1;
+    const x = document.createElement('input');
+    x.setAttribute('name', 'Xdimension');
+    x.setAttribute('class', 'Xdimension');
+    x.setAttribute('type', 'number');
+    x.setAttribute('min', '1');
+    x.setAttribute('placeholder', "Quantity of X dimension");
+    x.setAttribute('required', '');
+    x.required = true;
+
+    const labelY = document.createElement('label');
+    labelY.setAttribute('for', 'Ydimension');
+
+    const y = document.createElement('input');
+    y.setAttribute('name', 'Ydimension');
+    y.setAttribute('class', 'Ydimension');
+    y.setAttribute('type', 'number');
+    y.setAttribute('min', '1');
+    y.setAttribute('placeholder', "Quantity of Y dimension");
+    y.setAttribute('required', '');
+    y.required = true;
+
+    const labelZ = document.createElement('label');
+    labelZ.setAttribute('for', 'Zdimension');
+
+    const z = document.createElement('input');
+    z.setAttribute('name', 'Zdimension');
+    z.setAttribute('class', 'Zdimension');
+    z.setAttribute('type', 'number');
+    z.setAttribute('min', '1');
+    z.setAttribute('placeholder', "Quantity of Z dimension");
+    z.setAttribute('required', '');
+    z.required = true;
+
+    // assemble components
+    obstruct.appendChild(labelX);
+    obstruct.appendChild(x);
+    obstruct.appendChild(labelY);
+    obstruct.appendChild(y);
+    obstruct.appendChild(labelZ);
+    obstruct.appendChild(z);
+
+    // append to the space form containing the selected add obstruction button
+    console.log(obstruct);
+    console.log(e.target);
 };
 
-// use at end of function for add space
-let spaceFormID = 0;
-spaceFormContainer.querySelector(`#space-form-${spaceFormID}`).querySelector('.btn-add-obstruct').addEventListener("click", (spaceFormID) => {addObstruct(spaceFormID)});
-spaceFormID += 1;
+// Delegate click event for add obstruct button
+spaceFormContainer.querySelectorAll('.btn-add-obstruct').addEventListener("click", (e) => {addObstruct(e)});
 
 // Visualization
 const formVisual = panel.querySelector('#visualization-parameters');
@@ -495,5 +521,3 @@ function sliderInitRatio(sliderID, outputID) {
 sliderInitPercent("graph-resolution", "graph-resolution-val");
 sliderInitRatio("playback-multiplier", "playback-multiplier-val");
 
-// Runtime Controls
-const formControls = panel.querySelector('#playback-controls');

@@ -14,34 +14,97 @@
   </div>
   <div id="control-panel">
     <div class="panels-section">
+
           <form id="model-parameters" action="./" method="POST" class="content-highlight">
+
             <div class="center-flex">
               <p><big><b>Model Parameters</b></big></p>
             </div>
 
             <div id="space-form-container">
 
-              <div id="space-form-0" class="content-highlight2">
-                <div class="form-layout-block center-flex">
-                  <label for="data"><u>Space 1</u></label>
-                </div>
-                <br>
-                <div name="data" class="form-layout-block">
-                  <label for="name-space">Name</label>
-                  <input name="name-space" type="text" min="1" placeholder="Name of space" required>
+              <div class="space-form content-highlight2">
 
-                  <label for="x-dimension">X dimension</label>
-                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required>
-                  
-                  <label for="y-dimension">Y dimension</label>
-                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
-                  
-                  <label for="z-dimension">Z dimension</label>
-                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required>
-                </div>
-                <br>
                 <div class="form-layout-block center-flex">
-                  <div id="obstructions"></div>
+                  <div><u>Space 1</u></div>
+                </div>
+
+                <br>
+
+                <div class="form-layout-block">
+
+                  <label for="nameSpace">Name</label>
+                  <input name="nameSpace" class="nameSpace" type="text" min="1" placeholder="Name of space" required>
+
+                  <label for="Xdimension">X dimension</label>
+                  <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="points of X dimension" required>
+                  
+                  <label for="Ydimension">Y dimension</label>
+                  <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="points of Y dimension" required>
+                  
+                  <label for="Zdimension">Z dimension</label>
+                  <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="points of Z dimension" required>
+
+                </div>
+
+                <br>
+
+                <fieldset class="center-flex">
+
+                  <legend>Select number kind</legend>
+
+                  <div>
+                    <label>Integer</label>
+                    <input type="radio" name="integer" class="integer" value="true" required>
+                    <input type="radio" name="integer" class="integer" value="false" required>
+                    <label>Positive</label>
+                  </div>
+                  
+                </fieldset>
+                
+                <br>
+
+                <fieldset class="center-flex">
+
+                  <legend>Section into octants</legend>
+
+                  <div>
+                    <label>yes</label>
+                    <input type="radio" name="octant" class="octant" value="true" required>
+                    <input type="radio" name="octant" class="octant" value="false" required>
+                    <label>no</label>
+                  </div>
+
+                </fieldset>
+
+                <br>
+
+                <div class="form-layout-block center-flex">
+                  <div><u>Obstructions</u></div>
+                </div>
+
+                <br>
+
+                <div id="obstructions" class="form-layout-block center-flex">
+
+                  <div class="obstruction form-layout-block">
+
+                    <label for="Xdimension">X dimension</label>
+                    <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="Quantity of X dimension" required>
+                    
+                    <label for="Ydimension">Y dimension</label>
+                    <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
+                    
+                    <label for="Zdimension">Z dimension</label>
+                    <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="Quantity of Z dimension" required>                      
+
+                  </div>
+
+                </div>
+
+                <br>
+
+                <div class="center-flex">
                   <button class="button-style-1 btn-add-obstruct" type="button">add obstruction</button>
                 </div>
               </div>
@@ -55,12 +118,17 @@
             <hr noshade="true">
 
             <div id="object-form-container">
+
               <div id="object-1" class="content-highlight2">
+
                 <div class="form-layout-block center-flex">
                   <label for="space-1"><u>Object 1</u></label>
                 </div>
+
                 <br>
+
                 <div class="form-layout-block">
+
                   <label for="name-object">Name</label>
                   <input name="name-object" type="text" min="1" placeholder="Name of object" required>
                   
@@ -74,11 +142,16 @@
                   <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required>
                   
                 </div>
+
                 <div class="form-layout-block">
+
                   <label for="quantity">Quantity</label>
                   <input name="quantity" type="number" min="1" placeholder="Quantity of object" required>
+
                 </div>
+
               </div>
+
             </div>
 
             <div class="form-layout-block center-flex">
@@ -88,9 +161,10 @@
             <hr noshade="true">
 
             <div class="form-layout-block">
-              <button class="button-style-3" name="save" type="submit">Generate Model</button>
-              <button class="button-style-3" name="default" type="button">Initialize Parameters</button>
+              <button class="button-style-3" name="generate" type="submit">Generate</button>
+              <button class="button-style-3" name="initialize" type="button">Initialize</button>
             </div>
+
           </form>
 
           <form id="visualization-parameters" action="./" method="POST">
