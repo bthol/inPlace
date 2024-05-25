@@ -34,16 +34,16 @@
                 <div class="form-layout-block">
 
                   <label for="nameSpace">Name</label>
-                  <input name="nameSpace" class="nameSpace" type="text" min="1" placeholder="Name of space" required>
+                  <input name="nameSpace" class="nameSpace" type="text" min="1" placeholder="Name of space" required="true">
 
                   <label for="Xdimension">X dimension</label>
-                  <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="points of X dimension" required>
+                  <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="points of X dimension" required="true">
                   
                   <label for="Ydimension">Y dimension</label>
-                  <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="points of Y dimension" required>
+                  <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="points of Y dimension" required="true">
                   
                   <label for="Zdimension">Z dimension</label>
-                  <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="points of Z dimension" required>
+                  <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="points of Z dimension" required="true">
 
                 </div>
 
@@ -55,8 +55,8 @@
 
                   <div>
                     <label>Integer</label>
-                    <input type="radio" name="integer" class="integer" value="true" required>
-                    <input type="radio" name="integer" class="integer" value="false" required>
+                    <input type="radio" name="integer" class="integer cursor-pointer" value="true" required="true">
+                    <input type="radio" name="integer" class="integer cursor-pointer" value="false" required="true">
                     <label>Positive</label>
                   </div>
                   
@@ -70,8 +70,8 @@
 
                   <div>
                     <label>yes</label>
-                    <input type="radio" name="octant" class="octant" value="true" required>
-                    <input type="radio" name="octant" class="octant" value="false" required>
+                    <input type="radio" name="octant" class="octant cursor-pointer" value="true" required="true">
+                    <input type="radio" name="octant" class="octant cursor-pointer" value="false" required="true">
                     <label>no</label>
                   </div>
 
@@ -85,28 +85,14 @@
 
                 <br>
 
-                <div id="obstructions" class="form-layout-block center-flex">
-
-                  <div class="obstruction form-layout-block">
-
-                    <label for="Xdimension">X dimension</label>
-                    <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="Quantity of X dimension" required>
-                    
-                    <label for="Ydimension">Y dimension</label>
-                    <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
-                    
-                    <label for="Zdimension">Z dimension</label>
-                    <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="Quantity of Z dimension" required>                      
-
-                  </div>
-
-                </div>
+                <div class="obstructions form-layout-block-spaced center-flex"></div>
 
                 <br>
 
                 <div class="center-flex">
                   <button class="button-style-1 btn-add-obstruct" type="button">add obstruction</button>
                 </div>
+                
               </div>
 
             </div>

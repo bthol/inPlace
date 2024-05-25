@@ -410,6 +410,7 @@ function addObstruct(e) {
     // create components
     const labelX = document.createElement('label');
     labelX.setAttribute('for', 'Xdimension');
+    labelX.innerText = "X dimension";
 
     const x = document.createElement('input');
     x.setAttribute('name', 'Xdimension');
@@ -417,11 +418,11 @@ function addObstruct(e) {
     x.setAttribute('type', 'number');
     x.setAttribute('min', '1');
     x.setAttribute('placeholder', "Quantity of X dimension");
-    x.setAttribute('required', '');
-    x.required = true;
+    x.setAttribute('required', true);
 
     const labelY = document.createElement('label');
     labelY.setAttribute('for', 'Ydimension');
+    labelY.innerText = "Y dimension";
 
     const y = document.createElement('input');
     y.setAttribute('name', 'Ydimension');
@@ -429,11 +430,11 @@ function addObstruct(e) {
     y.setAttribute('type', 'number');
     y.setAttribute('min', '1');
     y.setAttribute('placeholder', "Quantity of Y dimension");
-    y.setAttribute('required', '');
-    y.required = true;
+    y.setAttribute('required', true);
 
     const labelZ = document.createElement('label');
     labelZ.setAttribute('for', 'Zdimension');
+    labelZ.innerText = "Z dimension";
 
     const z = document.createElement('input');
     z.setAttribute('name', 'Zdimension');
@@ -441,8 +442,7 @@ function addObstruct(e) {
     z.setAttribute('type', 'number');
     z.setAttribute('min', '1');
     z.setAttribute('placeholder', "Quantity of Z dimension");
-    z.setAttribute('required', '');
-    z.required = true;
+    z.setAttribute('required', true);
 
     // assemble components
     obstruct.appendChild(labelX);
@@ -452,13 +452,16 @@ function addObstruct(e) {
     obstruct.appendChild(labelZ);
     obstruct.appendChild(z);
 
-    // append to the space form containing the selected add obstruction button
-    console.log(obstruct);
-    console.log(e.target);
+    // append built obstruction form to the space form containing the selected button
+    e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
 };
 
 // Delegate click event for add obstruct button
-spaceFormContainer.querySelectorAll('.btn-add-obstruct').addEventListener("click", (e) => {addObstruct(e)});
+spaceFormContainer.querySelectorAll('.btn-add-obstruct').forEach((btn) => {
+    btn.addEventListener("click", (e) => {addObstruct(e)});
+});
+
+
 
 // Visualization
 const formVisual = panel.querySelector('#visualization-parameters');

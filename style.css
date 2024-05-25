@@ -65,6 +65,11 @@ hr {
     display: grid;
 }
 
+.form-layout-block-spaced {
+    display: grid;
+    grid-gap: 15px;
+}
+
 .content-highlight {
     width: max-content;
     background: var(--color-4);
@@ -118,6 +123,10 @@ input[type="range"] {
 }
 
 /* BUTTONS */
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .button-style-1 {
     cursor: pointer;
     padding: 3px 8px;
