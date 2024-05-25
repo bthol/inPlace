@@ -18,7 +18,7 @@
           <form id="model-parameters" action="./" method="POST" class="content-highlight">
 
             <div class="center-flex">
-              <p><big><b>Model Parameters</b></big></p>
+              <p><big><b>Model</b></big></p>
             </div>
 
             <div id="space-form-container">
@@ -105,10 +105,10 @@
 
             <div id="object-form-container">
 
-              <div id="object-1" class="content-highlight2">
+              <div class="object-form content-highlight2">
 
-                <div class="form-layout-block center-flex">
-                  <label for="space-1"><u>Object 1</u></label>
+                <div class="center-flex">
+                  <label for="space-1"><u>Object a</u></label>
                 </div>
 
                 <br>
@@ -116,23 +116,23 @@
                 <div class="form-layout-block">
 
                   <label for="name-object">Name</label>
-                  <input name="name-object" type="text" min="1" placeholder="Name of object" required>
+                  <input name="name-object" type="text" min="1" placeholder="Name of object" required="true">
                   
                   <label for="x-dimension">X dimension</label>
-                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required>
+                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required="true">
                   
                   <label for="y-dimension">Y dimension</label>
-                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required>
+                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required="true">
                   
                   <label for="z-dimension">Z dimension</label>
-                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required>
+                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required="true">
                   
                 </div>
 
                 <div class="form-layout-block">
 
                   <label for="quantity">Quantity</label>
-                  <input name="quantity" type="number" min="1" placeholder="Quantity of object" required>
+                  <input name="quantity" type="number" min="1" placeholder="Quantity of object" required="true">
 
                 </div>
 
@@ -141,7 +141,7 @@
             </div>
 
             <div class="form-layout-block center-flex">
-              <button class="button-style-1" id="btn-add-object" type="button">add object</button>
+              <button id="btn-add-object" class="button-style-1" type="button">add object</button>
             </div>
             
             <hr noshade="true">
@@ -218,11 +218,11 @@
 
               <hr noshade="true">
 
-              <div class="data-label-value">
+              <div class="data-label-value outline">
                 <div>Elapsed:</div>
                 <div id="realtime-data-total-duration">00:00:00</div>
               </div>
-              <div class="data-label-value">
+              <div class="data-label-value outline">
                 <div>Completion:</div>
                 <div id="realtime-data-total-duration">000%</div>
               </div>

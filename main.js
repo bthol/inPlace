@@ -7,9 +7,13 @@
 const panel = document.body.querySelector('#control-panel');
 const formModel = panel.querySelector('#model-parameters');
 const spaceFormContainer = formModel.querySelector('#space-form-container');
-const objectContainer = formModel.querySelector('#object-form-container');
+const objectFormContainer = formModel.querySelector('#object-form-container');
 const formControls = panel.querySelector('#playback-controls');
-const addSpaceBTN = document.body.querySelector('#btn-add-space');
+
+// onload buttons
+const addSpaceBTN = panel.querySelector('#btn-add-space');
+const addObstructBTN = spaceFormContainer.querySelector('.btn-add-obstruct');
+const addObjectBTN = panel.querySelector('#btn-add-object');
 
 /////////////////// MODEL ///////////////////
 // System of Identification
@@ -18,6 +22,7 @@ let obstructIDstructure = [0];
 let spaceIDstructure = [0];
 let objectIDstructure = [0];
 let spaceFormIDstructure = [1];
+let objectFormIDstructure = [1];
 
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
@@ -409,115 +414,43 @@ function removeForm(e) {
     e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
 };
 
-function addObstructForm(e) {
-    // build a new obstruction
-    const obstruct = document.createElement('div');
-    obstruct.setAttribute('class', 'obstruction form-layout-block');
-    obstruct.setAttribute('id', `obstruct-${generateID(obstructIDstructure)}`);
-    
-    // create components
-    const labelX = document.createElement('label');
-    labelX.setAttribute('for', 'Xdimension');
-    labelX.innerText = "X dimension";
-
-    const x = document.createElement('input');
-    x.setAttribute('name', 'Xdimension');
-    x.setAttribute('class', 'Xdimension');
-    x.setAttribute('type', 'number');
-    x.setAttribute('min', '1');
-    x.setAttribute('placeholder', "Quantity of X dimension");
-    x.setAttribute('required', true);
-
-    const labelY = document.createElement('label');
-    labelY.setAttribute('for', 'Ydimension');
-    labelY.innerText = "Y dimension";
-
-    const y = document.createElement('input');
-    y.setAttribute('name', 'Ydimension');
-    y.setAttribute('class', 'Ydimension');
-    y.setAttribute('type', 'number');
-    y.setAttribute('min', '1');
-    y.setAttribute('placeholder', "Quantity of Y dimension");
-    y.setAttribute('required', true);
-
-    const labelZ = document.createElement('label');
-    labelZ.setAttribute('for', 'Zdimension');
-    labelZ.innerText = "Z dimension";
-
-    const z = document.createElement('input');
-    z.setAttribute('name', 'Zdimension');
-    z.setAttribute('class', 'Zdimension');
-    z.setAttribute('type', 'number');
-    z.setAttribute('min', '1');
-    z.setAttribute('placeholder', "Quantity of Z dimension");
-    z.setAttribute('required', true);
-
-    const container = document.createElement('div');
-    container.setAttribute('class', 'center-flex');
-
-    const removeBTN = document.createElement('button');
-    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
-    removeBTN.setAttribute('type', 'button');
-    removeBTN.innerText = "remove";
-    removeBTN.addEventListener('click', (e) => removeForm(e));
-    
-    // assemble components
-    obstruct.appendChild(labelX);
-    obstruct.appendChild(x);
-    obstruct.appendChild(labelY);
-    obstruct.appendChild(y);
-    obstruct.appendChild(labelZ);
-    obstruct.appendChild(z);
-    container.appendChild(removeBTN);
-    obstruct.appendChild(container);
-
-    // append built obstruction to the space form containing the selected button
-    e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
+// form component functions
+function addBreak() {
+    return document.createElement('br');
 };
 
-function addSpaceForm() {
-    // build new space form
-    const form = document.createElement('div');
-    form.setAttribute('class', 'space-form content-highlight2');
+function titleComponent(text) {
+    // title component
+    const title = document.createElement('div');
+    title.setAttribute('class', 'center-flex');
 
-    // component functions
-    function addBreak() {
-        return document.createElement('br');
-    };
+    const titleDiv = document.createElement('div');
 
-    function titleComponent(text) {
-        // title component
-        const title = document.createElement('div');
-        title.setAttribute('class', 'center-flex');
+    const titleText = document.createElement('u');
+    titleText.innerText = `${text}`;
+    
+    // assemble title component
+    titleDiv.appendChild(titleText);
+    title.appendChild(titleDiv);
 
-        const titleDiv = document.createElement('div');
+    return title;
+};
 
-        const titleText = document.createElement('u');
-        titleText.innerText = `${text}`;
-        
-        // assemble title component
-        titleDiv.appendChild(titleText);
-        title.appendChild(titleDiv);
-
-        return title;
-    };
-
-    // create components
-    // dimensions component
+function dimensionsComponent() {
+    // Dimensions component
     const dimensions = document.createElement('div');
     dimensions.setAttribute('class', 'form-layout-block');
-
+    
     const labelName = document.createElement('label');
-    labelName.setAttribute('for', 'nameSpace');
-    labelName.innerText = 'Name';
+    labelName.setAttribute('for', 'name-object');
+    labelName.innerText = `Name`;
 
-    const nameSpace = document.createElement('input');
-    nameSpace.setAttribute('name', 'nameSpace');
-    nameSpace.setAttribute('class', 'nameSpace');
-    nameSpace.setAttribute('type', 'text');
-    nameSpace.setAttribute('min', '1');
-    nameSpace.setAttribute('placeholder', 'Name of space');
-    nameSpace.setAttribute('required', true);
+    const name = document.createElement('input');
+    name.setAttribute('name', 'name-object');
+    name.setAttribute('type', 'text');
+    name.setAttribute('min', '1');
+    name.setAttribute('placeholder', 'Name of object');
+    name.setAttribute('required', true);
 
     const labelX = document.createElement('label');
     labelX.setAttribute('for', 'Xdimension');
@@ -557,13 +490,92 @@ function addSpaceForm() {
 
     // assemble dimensions component
     dimensions.appendChild(labelName);
-    dimensions.appendChild(nameSpace);
+    dimensions.appendChild(name);
     dimensions.appendChild(labelX);
     dimensions.appendChild(x);
     dimensions.appendChild(labelY);
     dimensions.appendChild(y);
     dimensions.appendChild(labelZ);
     dimensions.appendChild(z);
+
+    return dimensions;
+};
+
+// form functions
+function addObstructForm(e) {
+    // build a new obstruction
+    const obstruct = document.createElement('div');
+    obstruct.setAttribute('class', 'obstruction form-layout-block outline');
+    obstruct.setAttribute('id', `obstruct-${generateID(obstructIDstructure)}`);
+    
+    // create components
+    const labelX = document.createElement('label');
+    labelX.setAttribute('for', 'Xdimension');
+    labelX.innerText = "X dimension";
+
+    const x = document.createElement('input');
+    x.setAttribute('name', 'Xdimension');
+    x.setAttribute('class', 'Xdimension');
+    x.setAttribute('type', 'number');
+    x.setAttribute('min', '1');
+    x.setAttribute('placeholder', "Quantity of X dimension");
+    x.setAttribute('required', true);
+
+    const labelY = document.createElement('label');
+    labelY.setAttribute('for', 'Ydimension');
+    labelY.innerText = "Y dimension";
+
+    const y = document.createElement('input');
+    y.setAttribute('name', 'Ydimension');
+    y.setAttribute('class', 'Ydimension');
+    y.setAttribute('type', 'number');
+    y.setAttribute('min', '1');
+    y.setAttribute('placeholder', "Quantity of Y dimension");
+    y.setAttribute('required', true);
+
+    const labelZ = document.createElement('label');
+    labelZ.setAttribute('for', 'Zdimension');
+    labelZ.innerText = "Z dimension";
+
+    const z = document.createElement('input');
+    z.setAttribute('name', 'Zdimension');
+    z.setAttribute('class', 'Zdimension');
+    z.setAttribute('type', 'number');
+    z.setAttribute('min', '1');
+    z.setAttribute('placeholder', "Quantity of Z dimension");
+    z.setAttribute('required', true);
+
+    // add obstruction button component
+    const container = document.createElement('div');
+    container.setAttribute('class', 'center-flex');
+
+    const removeBTN = document.createElement('button');
+    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
+    removeBTN.setAttribute('type', 'button');
+    removeBTN.innerText = "remove";
+    removeBTN.addEventListener('click', (e) => removeForm(e));
+    
+    // assemble components
+    obstruct.appendChild(labelX);
+    obstruct.appendChild(x);
+    obstruct.appendChild(labelY);
+    obstruct.appendChild(y);
+    obstruct.appendChild(labelZ);
+    obstruct.appendChild(z);
+    container.appendChild(removeBTN);
+    obstruct.appendChild(container);
+
+    // append built obstruction to the space form containing the selected button
+    e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
+};
+
+function addSpaceForm() {
+    // build new space form
+    const form = document.createElement('div');
+    form.setAttribute('class', 'space-form content-highlight2');
+
+
+    // create components
 
     // integer component
     const integer = document.createElement('fieldset');
@@ -672,7 +684,7 @@ function addSpaceForm() {
     // assemble components into form
     form.appendChild(titleComponent(`Space ${generateID(spaceFormIDstructure)}`));
     form.appendChild(addBreak());
-    form.appendChild(dimensions);
+    form.appendChild(dimensionsComponent());
     form.appendChild(addBreak());
     form.appendChild(integer);
     form.appendChild(addBreak());
@@ -690,16 +702,41 @@ function addSpaceForm() {
     spaceFormContainer.appendChild(form);
 };
 
-// attach listener on call of addSpaceForm
-spaceFormContainer.querySelectorAll('.btn-add-obstruct').forEach((btn) => {
-    btn.addEventListener("click", (e) => {addObstructForm(e)});
-});
+function addObjectForm() {
+    // build new object form
+    const form = document.createElement('div');
+    form.setAttribute('class', 'object-form content-highlight2');
 
+    // create components
+    // quantity component
+    const quantity = document.createElement('div');
+    quantity.setAttribute('class', 'form-layout-block');
 
-addSpaceBTN.addEventListener('click', addSpaceForm);
+    const labelQuant = document.createElement('label');
+    labelQuant.setAttribute('for', 'quantity');
+    labelQuant.innerText = 'Quantity';
 
+    const inputQuant = document.createElement('input');
+    inputQuant.setAttribute('name', 'quanitity');
+    inputQuant.setAttribute('type', 'number');
+    inputQuant.setAttribute('min', '1');
+    inputQuant.setAttribute('placeholder', 'Quantity of object');
+    inputQuant.setAttribute('required', true);
 
-// Visualization
+    // assemble quanitity component
+    quantity.appendChild(labelQuant);
+    quantity.appendChild(inputQuant);
+
+    // assemble components
+    form.appendChild(titleComponent(`Object ${generateID(objectFormIDstructure)}`));
+    form.appendChild(addBreak());
+    form.appendChild(dimensionsComponent());
+    form.appendChild(quantity);
+
+    // append to object form container
+    objectFormContainer.appendChild(form);
+};
+
 const formVisual = panel.querySelector('#visualization-parameters');
 // Slider Logic
 function sliderInitPercent(sliderID, outputID) {
@@ -760,3 +797,7 @@ function sliderInitRatio(sliderID, outputID) {
 sliderInitPercent("graph-resolution", "graph-resolution-val");
 sliderInitRatio("playback-multiplier", "playback-multiplier-val");
 
+// attach listeners to onload buttons
+addObstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
+addSpaceBTN.addEventListener('click', addSpaceForm);
+addObjectBTN.addEventListener('click', addObjectForm);
