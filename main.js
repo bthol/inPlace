@@ -459,7 +459,7 @@ function addObstructForm(e) {
     removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
     removeBTN.setAttribute('type', 'button');
     removeBTN.innerText = "remove";
-    removeBTN.addEventListener('click', removeForm);
+    removeBTN.addEventListener('click', (e) => removeForm(e));
     
     // assemble components
     obstruct.appendChild(labelX);
@@ -644,8 +644,8 @@ function addSpaceForm() {
     obstructions.setAttribute('class', 'obstructions form-layout-block-spaced center-flex');
 
     // addObstruct button component
-    const BTNcontainer = document.createElement('div');
-    BTNcontainer.setAttribute('class', 'center-flex');
+    const ObstructBTNcontainer = document.createElement('div');
+    ObstructBTNcontainer.setAttribute('class', 'center-flex');
 
     const obstructBTN = document.createElement('button');
     obstructBTN.setAttribute('class', 'button-style-1 btn-add-obstruct');
@@ -654,7 +654,20 @@ function addSpaceForm() {
     obstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
 
     // assemble addObstruct button component
-    BTNcontainer.appendChild(obstructBTN);
+    ObstructBTNcontainer.appendChild(obstructBTN);
+
+    // remove button component
+    const deleteSpaceBTNcontainer = document.createElement('div');
+    deleteSpaceBTNcontainer.setAttribute('class', 'center-flex');
+
+    const removeBTN = document.createElement('button');
+    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
+    removeBTN.setAttribute('type', 'button');
+    removeBTN.innerText = "delete space";
+    removeBTN.addEventListener('click', (e) => removeForm(e));
+
+    // assemble delete space button component
+    deleteSpaceBTNcontainer.appendChild(removeBTN);
 
     // assemble components into form
     form.appendChild(titleComponent(`Space ${generateID(spaceFormIDstructure)}`));
@@ -669,7 +682,9 @@ function addSpaceForm() {
     form.appendChild(addBreak());
     form.appendChild(obstructions);
     form.appendChild(addBreak());
-    form.appendChild(BTNcontainer);
+    form.appendChild(ObstructBTNcontainer);
+    form.appendChild(addBreak());
+    form.appendChild(deleteSpaceBTNcontainer);
 
     // append to space form container
     spaceFormContainer.appendChild(form);
