@@ -415,6 +415,24 @@ function removeForm(e) {
 };
 
 // form component functions
+function removeBTNComponent(text, addClass='') {
+    // create
+    const removeBTNcontainer = document.createElement('div');
+    removeBTNcontainer.setAttribute('class', 'center-flex');
+
+    const removeBTN = document.createElement('button');
+    removeBTN.setAttribute('class', `button-style-1 btn-add-obstruct ${addClass}`);
+    removeBTN.setAttribute('type', 'button');
+    removeBTN.innerText = `${text}`;
+    removeBTN.addEventListener("click", (e) => {removeForm(e)});
+
+    // assemble
+    removeBTNcontainer.appendChild(removeBTN);
+    
+    // return
+    return removeBTNcontainer;
+};
+
 function addBreak() {
     return document.createElement('br');
 };
@@ -544,16 +562,6 @@ function addObstructForm(e) {
     z.setAttribute('min', '1');
     z.setAttribute('placeholder', "Quantity of Z dimension");
     z.setAttribute('required', true);
-
-    // add obstruction button component
-    const container = document.createElement('div');
-    container.setAttribute('class', 'center-flex');
-
-    const removeBTN = document.createElement('button');
-    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
-    removeBTN.setAttribute('type', 'button');
-    removeBTN.innerText = "remove";
-    removeBTN.addEventListener('click', (e) => removeForm(e));
     
     // assemble components
     obstruct.appendChild(labelX);
@@ -562,8 +570,7 @@ function addObstructForm(e) {
     obstruct.appendChild(y);
     obstruct.appendChild(labelZ);
     obstruct.appendChild(z);
-    container.appendChild(removeBTN);
-    obstruct.appendChild(container);
+    obstruct.appendChild(removeBTNComponent('remove', 'removeBTN-layout'));
 
     // append built obstruction to the space form containing the selected button
     e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
@@ -668,19 +675,6 @@ function addSpaceForm() {
     // assemble addObstruct button component
     ObstructBTNcontainer.appendChild(obstructBTN);
 
-    // remove button component
-    const deleteSpaceBTNcontainer = document.createElement('div');
-    deleteSpaceBTNcontainer.setAttribute('class', 'center-flex');
-
-    const removeBTN = document.createElement('button');
-    removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
-    removeBTN.setAttribute('type', 'button');
-    removeBTN.innerText = "delete space";
-    removeBTN.addEventListener('click', (e) => removeForm(e));
-
-    // assemble delete space button component
-    deleteSpaceBTNcontainer.appendChild(removeBTN);
-
     // assemble components into form
     form.appendChild(titleComponent(`Space ${generateID(spaceFormIDstructure)}`));
     form.appendChild(addBreak());
@@ -696,7 +690,7 @@ function addSpaceForm() {
     form.appendChild(addBreak());
     form.appendChild(ObstructBTNcontainer);
     form.appendChild(addBreak());
-    form.appendChild(deleteSpaceBTNcontainer);
+    form.appendChild(removeBTNComponent('delete space'));
 
     // append to space form container
     spaceFormContainer.appendChild(form);
@@ -732,6 +726,8 @@ function addObjectForm() {
     form.appendChild(addBreak());
     form.appendChild(dimensionsComponent());
     form.appendChild(quantity);
+    form.appendChild(addBreak());
+    form.appendChild(removeBTNComponent('delete object'));
 
     // append to object form container
     objectFormContainer.appendChild(form);
