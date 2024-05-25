@@ -9,6 +9,7 @@ const formModel = panel.querySelector('#model-parameters');
 const spaceFormContainer = formModel.querySelector('#space-form-container');
 const objectContainer = formModel.querySelector('#object-form-container');
 const formControls = panel.querySelector('#playback-controls');
+const addSpaceBTN = document.body.querySelector('#btn-add-space');
 
 /////////////////// MODEL ///////////////////
 // System of Identification
@@ -16,7 +17,10 @@ let modelIDstructure = [0];
 let obstructIDstructure = [0];
 let spaceIDstructure = [0];
 let objectIDstructure = [0];
+let spaceFormIDstructure = [1];
+
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+
 function generateID(structure) {
     // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
     // compile ID string using current state of index structure
@@ -401,11 +405,11 @@ function defineObjectModel(name, x, y, z, quantity) {
 // console.log(objectDef);
 
 /////////////////// DISPLAY ///////////////////
-function removeObstruct(e) {
+function removeForm(e) {
     e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
 };
 
-function addObstruct(e) {
+function addObstructForm(e) {
     // build a new obstruction
     const obstruct = document.createElement('div');
     obstruct.setAttribute('class', 'obstruction form-layout-block');
@@ -455,7 +459,7 @@ function addObstruct(e) {
     removeBTN.setAttribute('class', 'button-style-1 removeBTN-layout');
     removeBTN.setAttribute('type', 'button');
     removeBTN.innerText = "remove";
-    removeBTN.addEventListener('click', removeObstruct);
+    removeBTN.addEventListener('click', removeForm);
     
     // assemble components
     obstruct.appendChild(labelX);
@@ -467,15 +471,217 @@ function addObstruct(e) {
     container.appendChild(removeBTN);
     obstruct.appendChild(container);
 
-    // append built obstruction form to the space form containing the selected button
+    // append built obstruction to the space form containing the selected button
     e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
 };
 
-// Delegate click event for add obstruct button
+function addSpaceForm() {
+    // build new space form
+    const form = document.createElement('div');
+    form.setAttribute('class', 'space-form content-highlight2');
+
+    // component functions
+    function addBreak() {
+        return document.createElement('br');
+    };
+
+    function titleComponent(text) {
+        // title component
+        const title = document.createElement('div');
+        title.setAttribute('class', 'center-flex');
+
+        const titleDiv = document.createElement('div');
+
+        const titleText = document.createElement('u');
+        titleText.innerText = `${text}`;
+        
+        // assemble title component
+        titleDiv.appendChild(titleText);
+        title.appendChild(titleDiv);
+
+        return title;
+    };
+
+    // create components
+    // dimensions component
+    const dimensions = document.createElement('div');
+    dimensions.setAttribute('class', 'form-layout-block');
+
+    const labelName = document.createElement('label');
+    labelName.setAttribute('for', 'nameSpace');
+    labelName.innerText = 'Name';
+
+    const nameSpace = document.createElement('input');
+    nameSpace.setAttribute('name', 'nameSpace');
+    nameSpace.setAttribute('class', 'nameSpace');
+    nameSpace.setAttribute('type', 'text');
+    nameSpace.setAttribute('min', '1');
+    nameSpace.setAttribute('placeholder', 'Name of space');
+    nameSpace.setAttribute('required', true);
+
+    const labelX = document.createElement('label');
+    labelX.setAttribute('for', 'Xdimension');
+    labelX.innerText = 'X dimension';
+
+    const x = document.createElement('input');
+    x.setAttribute('name', 'Xdimension');
+    x.setAttribute('class', 'Xdimension');
+    x.setAttribute('type', 'number');
+    x.setAttribute('min', '1');
+    x.setAttribute('placeholder', 'points of X dimension');
+    x.setAttribute('required', true);
+
+    const labelY = document.createElement('label');
+    labelY.setAttribute('for', 'Ydimension');
+    labelY.innerText = 'Y dimension';
+
+    const y = document.createElement('input');
+    y.setAttribute('name', 'Ydimension');
+    y.setAttribute('class', 'Ydimension');
+    y.setAttribute('type', 'number');
+    y.setAttribute('min', '1');
+    y.setAttribute('placeholder', 'points of Y dimension');
+    y.setAttribute('required', true);
+
+    const labelZ = document.createElement('label');
+    labelZ.setAttribute('for', 'Ydimension');
+    labelZ.innerText = 'Z dimension';
+
+    const z = document.createElement('input');
+    z.setAttribute('name', 'Zdimension');
+    z.setAttribute('class', 'Zdimension');
+    z.setAttribute('type', 'number');
+    z.setAttribute('min', '1');
+    z.setAttribute('placeholder', 'points of Z dimension');
+    z.setAttribute('required', true);
+
+    // assemble dimensions component
+    dimensions.appendChild(labelName);
+    dimensions.appendChild(nameSpace);
+    dimensions.appendChild(labelX);
+    dimensions.appendChild(x);
+    dimensions.appendChild(labelY);
+    dimensions.appendChild(y);
+    dimensions.appendChild(labelZ);
+    dimensions.appendChild(z);
+
+    // integer component
+    const integer = document.createElement('fieldset');
+    integer.setAttribute('class', 'center-flex');
+
+    const integerLegend = document.createElement('legend');
+    integerLegend.innerText = 'Select number kind';
+
+    const integerOptions = document.createElement('div');
+
+    const labelInt = document.createElement('label');
+    labelInt.innerText = 'Integer';
+
+    const optionInt = document.createElement('input');
+    optionInt.setAttribute('type', 'radio');
+    optionInt.setAttribute('name', 'integer');
+    optionInt.setAttribute('class', 'integer cursor-pointer');
+    optionInt.setAttribute('value', 'true');
+    optionInt.setAttribute('required', true);
+    
+    const labelPos = document.createElement('label');
+    labelPos.innerText = 'Positive';
+
+    const optionPos = document.createElement('input');
+    optionPos.setAttribute('type', 'radio');
+    optionPos.setAttribute('name', 'integer');
+    optionPos.setAttribute('class', 'integer cursor-pointer');
+    optionPos.setAttribute('value', 'false');
+    optionPos.setAttribute('required', true);
+
+    // integer component assemble
+    integer.appendChild(integerLegend);
+    integerOptions.appendChild(labelInt);
+    integerOptions.appendChild(optionInt);
+    integerOptions.appendChild(optionPos);
+    integerOptions.appendChild(labelPos);
+    integer.appendChild(integerOptions);
+    
+    // octant component
+    const octant = document.createElement('fieldset');
+    octant.setAttribute('class', 'center-flex');
+
+    const octantLegend = document.createElement('legend');
+    octantLegend.innerText = 'Section into octants';
+
+    const octantOptions = document.createElement('div');
+
+    const labelTrue = document.createElement('label');
+    labelTrue.innerText = 'True';
+
+    const optionTrue = document.createElement('input');
+    optionTrue.setAttribute('type', 'radio');
+    optionTrue.setAttribute('name', 'octant');
+    optionTrue.setAttribute('class', 'octant cursor-pointer');
+    optionTrue.setAttribute('value', 'true');
+    optionTrue.setAttribute('required', true);
+    
+    const labelFalse = document.createElement('label');
+    labelFalse.innerText = 'False';
+
+    const optionFalse = document.createElement('input');
+    optionFalse.setAttribute('type', 'radio');
+    optionFalse.setAttribute('name', 'octant');
+    optionFalse.setAttribute('class', 'octant cursor-pointer');
+    optionFalse.setAttribute('value', 'false');
+    optionFalse.setAttribute('required', true);
+
+    // assemble octant component
+    octant.appendChild(octantLegend);
+    octantOptions.appendChild(labelTrue);
+    octantOptions.appendChild(optionTrue);
+    octantOptions.appendChild(optionFalse);
+    octantOptions.appendChild(labelFalse);
+    octant.appendChild(octantOptions);
+
+    // Obstructions component
+    const obstructions = document.createElement('div');
+    obstructions.setAttribute('class', 'obstructions form-layout-block-spaced center-flex');
+
+    // addObstruct button component
+    const BTNcontainer = document.createElement('div');
+    BTNcontainer.setAttribute('class', 'center-flex');
+
+    const obstructBTN = document.createElement('button');
+    obstructBTN.setAttribute('class', 'button-style-1 btn-add-obstruct');
+    obstructBTN.setAttribute('type', 'button');
+    obstructBTN.innerText = 'add obstruction';
+    obstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
+
+    // assemble addObstruct button component
+    BTNcontainer.appendChild(obstructBTN);
+
+    // assemble components into form
+    form.appendChild(titleComponent(`Space ${generateID(spaceFormIDstructure)}`));
+    form.appendChild(addBreak());
+    form.appendChild(dimensions);
+    form.appendChild(addBreak());
+    form.appendChild(integer);
+    form.appendChild(addBreak());
+    form.appendChild(octant);
+    form.appendChild(addBreak());
+    form.appendChild(titleComponent('Obstructions'));
+    form.appendChild(addBreak());
+    form.appendChild(obstructions);
+    form.appendChild(addBreak());
+    form.appendChild(BTNcontainer);
+
+    // append to space form container
+    spaceFormContainer.appendChild(form);
+};
+
+// attach listener on call of addSpaceForm
 spaceFormContainer.querySelectorAll('.btn-add-obstruct').forEach((btn) => {
-    btn.addEventListener("click", (e) => {addObstruct(e)});
+    btn.addEventListener("click", (e) => {addObstructForm(e)});
 });
 
+
+addSpaceBTN.addEventListener('click', addSpaceForm);
 
 
 // Visualization
