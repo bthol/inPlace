@@ -17,6 +17,7 @@ const formVisual = panel.querySelector('#visualization-parameters');
 const spaceFormContainer = formModel.querySelector('#space-form-container');
 const objectFormContainer = formModel.querySelector('#object-form-container');
 
+
 // onload buttons
 const addSpaceBTN = panel.querySelector('#btn-add-space');
 const addObstructBTN = spaceFormContainer.querySelector('.btn-add-obstruct');
@@ -77,7 +78,7 @@ let objectDef = [];
 let objects = [];
 
 // Defintion of Spatial Models
-function defineSpatialModel(name, x, y, z, integer = false, octant = false, obstruct) {
+function defineSpatialModel(name, x, y, z, integer = false, octant = false, obstruct = []) {
     let model = {};
     model.modelID = generateID(modelIDstructure);
     model.instances = 0;
@@ -176,12 +177,13 @@ function generateSpatialModels() {
         defineSpatialModel(name, x, y, z, integer, octant, obstruct);
     });
 };
-// generateSpatialModels();
 
 // Live Spaces
 function generateSpace(modelID) {
     // get model for reference using the modelID
     const mod = spaceDef[getModelIndex(modelID)];
+    // console.log(mod);
+    
     // generate a space from the model
     let space = [];
     if (mod.integer === false) {
@@ -204,27 +206,36 @@ function generateSpace(modelID) {
             const xMedian = Math.floor(mod.x / 2);
             const yMedian = Math.floor(mod.y / 2);
             const zMedian = Math.floor(mod.z / 2);
+            console.log(`medians: ${xMedian}, ${yMedian}, ${zMedian}`);
 
             for (let x = 0; x < mod.x; x++) {
                 for (let y = 0; y < mod.y; y++) {
                     for (let z = 0; z < mod.z; z++) {
                         // each coordinate point
-                        if (x < xMedian && y >= 0 && z < 0) {
+                        if (x < xMedian && y >= yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 1});
+                            console.log(`coor1: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y >= yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 2});
+                            console.log(`coor2: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y < yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 3});
+                            console.log(`coor3: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y < yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 4});
+                            console.log(`coor4: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y >= yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 5});
+                            console.log(`coor5: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y >= yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 6});
+                            console.log(`coor6: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y < yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 7});
+                            console.log(`coor7: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y < yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 8});
+                            console.log(`coor8: ${x}, ${y}, ${z}`);
                         }
                     }
                 }
@@ -275,6 +286,7 @@ function generateSpace(modelID) {
         }
     }
     mod.instances += 1;
+    // console.log({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDstructure)});
     spaces.push({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDstructure)});
 };
 
@@ -399,22 +411,28 @@ function defineObjectModel(name, x, y, z, quantity) {
 
 /////////////////// PROCESS ///////////////////
 
-defineSpatialModel("space-1", 10, 10, 10, true, true, []);
-defineSpatialModel("space-2", 8, 6, 4, []);
+// defineSpatialModel("space-1", 10, 10, 10, true, true);
+// defineSpatialModel("space-2", 8, 6, 4);
 
-generateSpace(spaceDef[0].modelID);
+// generateSpacePerModel();
+// generateSpace(spaceDef[0].modelID);
+// console.log(spaceDef);
+// console.log(spaces);
+
+// closePoint(spaceDef[0].modelID, [1, 2, -3]);
+// console.log(readPoint(spaceDef[0].modelID, [1, 2, -3]));
+// openPoint(spaceDef[0].modelID, [1, 2, -3]);
+// console.log(readPoint(spaceDef[0].modelID, [1, 2, -3]));
+
+// defineObjectModel("object-1", 1, 1, 1, 2);
+// defineObjectModel("object-2", 2, 5, 3, 1);
+// console.log(objectDef);
+
+generateSpatialModels();
 generateSpacePerModel();
 console.log(spaceDef);
 console.log(spaces);
 
-closePoint("a", [1, 2, -3]);
-console.log(readPoint("a", [1, 2, -3]));
-openPoint("a", [1, 2, -3]);
-console.log(readPoint("a", [1, 2, -3]));
-
-defineObjectModel("object-1", 1, 1, 1, 2);
-defineObjectModel("object-2", 2, 5, 3, 1);
-console.log(objectDef);
 
 /////////////////// DISPLAY ///////////////////
 // form component functions
