@@ -29,8 +29,8 @@ let modelIDstructure = [0];
 let obstructIDstructure = [0];
 let spaceIDstructure = [0];
 let objectIDstructure = [0];
-let spaceFormIDstructure = [1];
-let objectFormIDstructure = [1];
+let spaceFormIDstructure = [0];
+let objectFormIDstructure = [0];
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 function generateID(structure) {
     // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
@@ -63,7 +63,7 @@ function generateID(structure) {
     return id;
 };
 
-function getIDfromStructure(structure) {
+function getID(structure) {
     let id = "";
     for (let i = 0; i < structure.length; i++) {
         id += characters[structure[i]];
@@ -141,7 +141,7 @@ function generateSpatialModels() {
     // run defineSpatialModel for every space form
     spaceFormContainer.querySelectorAll('.space-form').forEach((form) => {
         // get information from form
-        const name = form.querySelector('.nameSpace').value;
+        const name = form.querySelector('.name-space').value;
         const x = form.querySelector('.Xdimension').value;
         const y = form.querySelector('.Ydimension').value;
         const z = form.querySelector('.Zdimension').value;
@@ -206,7 +206,6 @@ function generateSpace(modelID) {
             const xMedian = Math.floor(mod.x / 2);
             const yMedian = Math.floor(mod.y / 2);
             const zMedian = Math.floor(mod.z / 2);
-            console.log(`medians: ${xMedian}, ${yMedian}, ${zMedian}`);
 
             for (let x = 0; x < mod.x; x++) {
                 for (let y = 0; y < mod.y; y++) {
@@ -214,28 +213,20 @@ function generateSpace(modelID) {
                         // each coordinate point
                         if (x < xMedian && y >= yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 1});
-                            console.log(`coor1: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y >= yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 2});
-                            console.log(`coor2: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y < yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 3});
-                            console.log(`coor3: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y < yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 4});
-                            console.log(`coor4: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y >= yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 5});
-                            console.log(`coor5: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y >= yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 6});
-                            console.log(`coor6: ${x}, ${y}, ${z}`);
                         } else if (x >= xMedian && y < yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 7});
-                            console.log(`coor7: ${x}, ${y}, ${z}`);
                         } else if (x < xMedian && y < yMedian && z >= zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 8});
-                            console.log(`coor8: ${x}, ${y}, ${z}`);
                         }
                     }
                 }
@@ -475,69 +466,136 @@ function titleComponent(text) {
     return title;
 };
 
-function dimensionsComponent() {
-    // Dimensions component
-    const dimensions = document.createElement('div');
-    dimensions.setAttribute('class', 'form-layout-block');
+function dimensionsComponent(type) {
+    if (type === "space") {
+        // Dimensions component for space forms
+        const dimensions = document.createElement('div');
+        dimensions.setAttribute('class', 'form-layout-block');
+        
+        const labelName = document.createElement('label');
+        labelName.setAttribute('for', `name-space-${getID(spaceFormIDstructure)}`);
+        labelName.innerText = `Name`;
     
-    const labelName = document.createElement('label');
-    labelName.setAttribute('for', 'name-object');
-    labelName.innerText = `Name`;
+        const name = document.createElement('input');
+        name.setAttribute('name', `name-space-${getID(spaceFormIDstructure)}`);
+        name.setAttribute('type', 'text');
+        name.setAttribute('min', '1');
+        name.setAttribute('max', '10');
+        name.setAttribute('placeholder', 'Name of space');
+        name.setAttribute('required', true);
+    
+        const labelX = document.createElement('label');
+        labelX.setAttribute('for', 'Xdimension');
+        labelX.innerText = 'X dimension';
+    
+        const x = document.createElement('input');
+        x.setAttribute('name', 'Xdimension');
+        x.setAttribute('class', 'Xdimension');
+        x.setAttribute('type', 'number');
+        x.setAttribute('min', '2');
+        x.setAttribute('placeholder', 'points of X dimension');
+        x.setAttribute('required', true);
+    
+        const labelY = document.createElement('label');
+        labelY.setAttribute('for', 'Ydimension');
+        labelY.innerText = 'Y dimension';
+    
+        const y = document.createElement('input');
+        y.setAttribute('name', 'Ydimension');
+        y.setAttribute('class', 'Ydimension');
+        y.setAttribute('type', 'number');
+        y.setAttribute('min', '2');
+        y.setAttribute('placeholder', 'points of Y dimension');
+        y.setAttribute('required', true);
+    
+        const labelZ = document.createElement('label');
+        labelZ.setAttribute('for', 'Ydimension');
+        labelZ.innerText = 'Z dimension';
+    
+        const z = document.createElement('input');
+        z.setAttribute('name', 'Zdimension');
+        z.setAttribute('class', 'Zdimension');
+        z.setAttribute('type', 'number');
+        z.setAttribute('min', '2');
+        z.setAttribute('placeholder', 'points of Z dimension');
+        z.setAttribute('required', true);
+    
+        // assemble dimensions component
+        dimensions.appendChild(labelName);
+        dimensions.appendChild(name);
+        dimensions.appendChild(labelX);
+        dimensions.appendChild(x);
+        dimensions.appendChild(labelY);
+        dimensions.appendChild(y);
+        dimensions.appendChild(labelZ);
+        dimensions.appendChild(z);
+    
+        return dimensions;
 
-    const name = document.createElement('input');
-    name.setAttribute('name', 'name-object');
-    name.setAttribute('type', 'text');
-    name.setAttribute('min', '1');
-    name.setAttribute('placeholder', 'Name of object');
-    name.setAttribute('required', true);
-
-    const labelX = document.createElement('label');
-    labelX.setAttribute('for', 'Xdimension');
-    labelX.innerText = 'X dimension';
-
-    const x = document.createElement('input');
-    x.setAttribute('name', 'Xdimension');
-    x.setAttribute('class', 'Xdimension');
-    x.setAttribute('type', 'number');
-    x.setAttribute('min', '1');
-    x.setAttribute('placeholder', 'points of X dimension');
-    x.setAttribute('required', true);
-
-    const labelY = document.createElement('label');
-    labelY.setAttribute('for', 'Ydimension');
-    labelY.innerText = 'Y dimension';
-
-    const y = document.createElement('input');
-    y.setAttribute('name', 'Ydimension');
-    y.setAttribute('class', 'Ydimension');
-    y.setAttribute('type', 'number');
-    y.setAttribute('min', '1');
-    y.setAttribute('placeholder', 'points of Y dimension');
-    y.setAttribute('required', true);
-
-    const labelZ = document.createElement('label');
-    labelZ.setAttribute('for', 'Ydimension');
-    labelZ.innerText = 'Z dimension';
-
-    const z = document.createElement('input');
-    z.setAttribute('name', 'Zdimension');
-    z.setAttribute('class', 'Zdimension');
-    z.setAttribute('type', 'number');
-    z.setAttribute('min', '1');
-    z.setAttribute('placeholder', 'points of Z dimension');
-    z.setAttribute('required', true);
-
-    // assemble dimensions component
-    dimensions.appendChild(labelName);
-    dimensions.appendChild(name);
-    dimensions.appendChild(labelX);
-    dimensions.appendChild(x);
-    dimensions.appendChild(labelY);
-    dimensions.appendChild(y);
-    dimensions.appendChild(labelZ);
-    dimensions.appendChild(z);
-
-    return dimensions;
+    } else if (type === "object") {
+        // Dimensions component for object forms
+        const dimensions = document.createElement('div');
+        dimensions.setAttribute('class', 'form-layout-block');
+        
+        const labelName = document.createElement('label');
+        labelName.setAttribute('for', `name-object-${getID(objectFormIDstructure)}`);
+        labelName.innerText = `Name`;
+    
+        const name = document.createElement('input');
+        name.setAttribute('name', `name-object-${getID(objectFormIDstructure)}`);
+        name.setAttribute('type', 'text');
+        name.setAttribute('min', '1');
+        name.setAttribute('placeholder', 'Name of object');
+        name.setAttribute('required', true);
+    
+        const labelX = document.createElement('label');
+        labelX.setAttribute('for', 'Xdimension');
+        labelX.innerText = 'X dimension';
+    
+        const x = document.createElement('input');
+        x.setAttribute('name', 'Xdimension');
+        x.setAttribute('class', 'Xdimension');
+        x.setAttribute('type', 'number');
+        x.setAttribute('min', '1');
+        x.setAttribute('placeholder', 'points of X dimension');
+        x.setAttribute('required', true);
+    
+        const labelY = document.createElement('label');
+        labelY.setAttribute('for', 'Ydimension');
+        labelY.innerText = 'Y dimension';
+    
+        const y = document.createElement('input');
+        y.setAttribute('name', 'Ydimension');
+        y.setAttribute('class', 'Ydimension');
+        y.setAttribute('type', 'number');
+        y.setAttribute('min', '1');
+        y.setAttribute('placeholder', 'points of Y dimension');
+        y.setAttribute('required', true);
+    
+        const labelZ = document.createElement('label');
+        labelZ.setAttribute('for', 'Ydimension');
+        labelZ.innerText = 'Z dimension';
+    
+        const z = document.createElement('input');
+        z.setAttribute('name', 'Zdimension');
+        z.setAttribute('class', 'Zdimension');
+        z.setAttribute('type', 'number');
+        z.setAttribute('min', '1');
+        z.setAttribute('placeholder', 'points of Z dimension');
+        z.setAttribute('required', true);
+    
+        // assemble dimensions component
+        dimensions.appendChild(labelName);
+        dimensions.appendChild(name);
+        dimensions.appendChild(labelX);
+        dimensions.appendChild(x);
+        dimensions.appendChild(labelY);
+        dimensions.appendChild(y);
+        dimensions.appendChild(labelZ);
+        dimensions.appendChild(z);
+    
+        return dimensions;
+    }
 };
 
 // form functions
@@ -598,10 +656,11 @@ function addObstructForm(e) {
 };
 
 function addSpaceForm() {
+    generateID(spaceFormIDstructure);
     // build new space form
     const form = document.createElement('div');
     form.setAttribute('class', 'space-form content-highlight2');
-
+    form.setAttribute('id', `space-form-${getID(spaceFormIDstructure)}`);
 
     // create components
 
@@ -697,9 +756,9 @@ function addSpaceForm() {
     ObstructBTNcontainer.appendChild(obstructBTN);
 
     // assemble components into form
-    form.appendChild(titleComponent(`Space ${generateID(spaceFormIDstructure)}`));
+    form.appendChild(titleComponent(`Space ${getID(spaceFormIDstructure)}`));
     form.appendChild(addBreak());
-    form.appendChild(dimensionsComponent());
+    form.appendChild(dimensionsComponent("space"));
     form.appendChild(addBreak());
     form.appendChild(integer);
     form.appendChild(addBreak());
@@ -718,9 +777,11 @@ function addSpaceForm() {
 };
 
 function addObjectForm() {
+    generateID(objectFormIDstructure);
     // build new object form
     const form = document.createElement('div');
     form.setAttribute('class', 'object-form content-highlight2');
+    form.setAttribute('id', `object-form-${getID(objectFormIDstructure)}`);
 
     // create components
     // quantity component
@@ -743,9 +804,9 @@ function addObjectForm() {
     quantity.appendChild(inputQuant);
 
     // assemble components
-    form.appendChild(titleComponent(`Object ${generateID(objectFormIDstructure)}`));
+    form.appendChild(titleComponent(`Object ${getID(objectFormIDstructure)}`));
     form.appendChild(addBreak());
-    form.appendChild(dimensionsComponent());
+    form.appendChild(dimensionsComponent("object"));
     form.appendChild(quantity);
     form.appendChild(addBreak());
     form.appendChild(removeBTNComponent('delete object'));
