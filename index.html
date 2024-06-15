@@ -67,13 +67,10 @@
                 <fieldset class="center-flex">
 
                   <legend>Section into octants</legend>
-
-                  <div>
-                    <label>True</label>
-                    <input type="radio" name="octant" class="octant cursor-pointer" value="true" required="true">
-                    <input type="radio" name="octant" class="octant cursor-pointer" value="false" required="true">
-                    <label>False</label>
-                  </div>
+                  <label>True</label>
+                  <input type="radio" name="octant" class="octant cursor-pointer" value="true" required="true">
+                  <input type="radio" name="octant" class="octant cursor-pointer" value="false" required="true">
+                  <label>False</label>
 
                 </fieldset>
 
@@ -108,7 +105,7 @@
               <div id="object-form-a" class="object-form content-highlight2">
 
                 <div class="center-flex">
-                  <label for="space-1"><u>Object a</u></label>
+                  <div><u>Object a</u></div>
                 </div>
 
                 <br>
@@ -116,23 +113,23 @@
                 <div class="form-layout-block">
 
                   <label for="name-object">Name</label>
-                  <input name="name-object" type="text" min="1" max="10" placeholder="Name of object" required="true">
+                  <input name="name-object" class="name-object" type="text" min="1" max="10" placeholder="Name of object" required="true">
                   
-                  <label for="x-dimension">X dimension</label>
-                  <input name="x-dimension" type="number" min="1" placeholder="Quantity of X dimension" required="true">
+                  <label for="Xdimension">X dimension</label>
+                  <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="Quantity of X dimension" required="true">
                   
-                  <label for="y-dimension">Y dimension</label>
-                  <input name="y-dimension" type="number" min="1" placeholder="Quantity of Y dimension" required="true">
+                  <label for="Ydimension">Y dimension</label>
+                  <input name="Ydimension" class="Ydimension" type="number" min="1" placeholder="Quantity of Y dimension" required="true">
                   
-                  <label for="z-dimension">Z dimension</label>
-                  <input name="z-dimension" type="number" min="1" placeholder="Quantity of Z dimension" required="true">
+                  <label for="Zdimension">Z dimension</label>
+                  <input name="Zdimension" class="Zdimension" type="number" min="1" placeholder="Quantity of Z dimension" required="true">
                   
                 </div>
 
                 <div class="form-layout-block">
 
                   <label for="quantity">Quantity</label>
-                  <input name="quantity" type="number" min="1" placeholder="Quantity of object" required="true">
+                  <input name="quantity" class="quantity" type="number" min="1" placeholder="Quantity of object" required="true">
 
                 </div>
 

@@ -17,7 +17,6 @@ const formVisual = panel.querySelector('#visualization-parameters');
 const spaceFormContainer = formModel.querySelector('#space-form-container');
 const objectFormContainer = formModel.querySelector('#object-form-container');
 
-
 // onload buttons
 const addSpaceBTN = panel.querySelector('#btn-add-space');
 const addObstructBTN = spaceFormContainer.querySelector('.btn-add-obstruct');
@@ -25,13 +24,17 @@ const addObjectBTN = panel.querySelector('#btn-add-object');
 
 /////////////////// MODEL ///////////////////
 // System of Identification
-let modelIDstructure = [0];
-let obstructIDstructure = [0];
 let spaceIDstructure = [0];
 let objectIDstructure = [0];
+
+let modelIDstructure = [0];
+
 let spaceFormIDstructure = [0];
+let obstructFormIDstructure = [0];
 let objectFormIDstructure = [0];
-const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+
+const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" ];
+
 function generateID(structure) {
     // algorithm uses relevant data structures to generate unique ID string with theoretically infinite variations
     // compile ID string using current state of index structure
@@ -73,36 +76,48 @@ function getID(structure) {
 
 // Data Structures
 let spaceDef = [];
-let spaces = [];
 let objectDef = [];
-let objects = [];
+let models = [];
 
-// Defintion of Spatial Models
-function defineSpatialModel(name, x, y, z, integer = false, octant = false, obstruct = []) {
-    let model = {};
-    model.modelID = generateID(modelIDstructure);
-    model.instances = 0;
-    model.integer = integer;
-    model.modelName = name;
-    model.obstruct = obstruct;
-    model.x = x;
-    model.y = y;
-    model.z = z;
-    if (x === y && y === z) {
-        model.cubic = true;
-    } else {
-        model.cubic = false;
+// Structural Access Functionality
+function getSpaceIndex(spaceID) {
+    // search for space index by spaceID
+    let spaceIndex = undefined;
+    for (let i = 0; i < spaceDef.length; i++) {
+        if (spaceDef[i].spaceID === spaceID) {
+            spaceIndex = i;
+            break;
+        }
     }
-    model.octant = octant;
-    model.volume = x * y * z;
-    spaceDef.push(model);
+    if (spaceIndex === undefined) {
+        return console.log(`No such space by the spaceID "${spaceID}"!`);
+    } else {
+        return spaceIndex;
+    }
+};
+
+function getObjectIndex(objectID) {
+    // search for object index by objectID
+    let objectIndex = undefined;
+    for (let i = 0; i < objectDef.length; i++) {
+        if (objectDef[i].objectID === objectID) {
+            objectIndex = i;
+            break;
+        }
+    }
+    if (objectIndex === undefined) {
+        console.log(`No such object by the objectID "${objectID}"!`);
+        return objectIndex;
+    } else {
+        return objectIndex;
+    }
 };
 
 function getModelIndex(modelID) {
-    // search for model index by modelID
+    // search for space index by modelID
     let modelIndex = undefined;
-    for (let i = 0; i < spaceDef.length; i++) {
-        if (spaceDef[i].modelID === modelID) {
+    for (let i = 0; i < models.length; i++) {
+        if (models[i].modelID === modelID) {
             modelIndex = i;
             break;
         }
@@ -114,31 +129,29 @@ function getModelIndex(modelID) {
     }
 };
 
-function validCoor(modelID, x, y, z) {
-    const model = spaceDef[getModelIndex(modelID)];
-    if (model.integer === false) {
-        // non integer space
-        if (x >= 0 && x < model.x && y >= 0 && y < model.y && z >= 0 && z < model.z) {
-            // if each coordinate value satasfies the range for that dimension in the model
-            return true;
-        } else {
-            console.log(`No such coordinate in ${model.modelName}!`);
-            return false;
-        }
+// Defintion of Spaces
+function defineSpace(name, x, y, z, integer = false, octant = false, obstruct = []) {
+    let def = {};
+    def.spaceID = generateID(spaceIDstructure);
+    def.instances = 0;
+    def.integer = integer;
+    def.name = name;
+    def.obstruct = obstruct;
+    def.x = x;
+    def.y = y;
+    def.z = z;
+    if (x === y && y === z) {
+        def.cubic = true;
     } else {
-        // integer space
-        if (x >= -(Math.ceil(model.x / 2)) + 1 && x < Math.floor(model.x / 2) + 1 && y >= -(Math.ceil(model.y / 2)) + 1 && y < Math.floor(model.y / 2) + 1 && z >= -(Math.ceil(model.z / 2)) + 1 && z < Math.floor(model.z / 2) + 1) {
-            // if each coordinate value satasfies the range for that dimension in the model
-            return true;
-        } else {
-            console.log(`No such coordinate in ${model.modelName}!`);
-            return false;
-        }
+        def.cubic = false;
     }
+    def.octant = octant;
+    def.volume = x * y * z;
+    spaceDef.push(def);
 };
 
-function generateSpatialModels() {
-    // run defineSpatialModel for every space form
+function defineSpaces() {
+    // run defineSpace for every space form
     spaceFormContainer.querySelectorAll('.space-form').forEach((form) => {
         // get information from form
         const name = form.querySelector('.name-space').value;
@@ -173,27 +186,50 @@ function generateSpatialModels() {
             const z = o.querySelector('.Zdimension').value;
             obstruct.push([x, y, z]);
         });
-        // pass info as arguments into defineSpatialModels function
-        defineSpatialModel(name, x, y, z, integer, octant, obstruct);
+        // pass info as arguments into defineSpaces function
+        defineSpace(name, x, y, z, integer, octant, obstruct);
     });
 };
 
-// Live Spaces
-function generateSpace(modelID) {
-    // get model for reference using the modelID
-    const mod = spaceDef[getModelIndex(modelID)];
-    // console.log(mod);
+// Defintion of Objects
+function defineObject(name, x, y, z, quantity) {
+    let mod = {};
+    mod.x = x;
+    mod.y = y;
+    mod.z = z;
+    mod.objectName = name;
+    mod.objectID = generateID(objectIDstructure);
+    mod.quantity = quantity;
+    objectDef.push(mod);
+};
+
+function defineObjects() {
+    objectFormContainer.querySelectorAll('.object-form').forEach((form) => {
+        const name = form.querySelector('.name-object').value;
+        const x = form.querySelector('.Xdimension').value;
+        const y = form.querySelector('.Ydimension').value;
+        const z = form.querySelector('.Zdimension').value;
+        const quantity = form.querySelector('.quantity').value;
+        defineObject(name, x, y, z, quantity);
+    });
+};
+
+// Model Generation
+function generateModel(spaceID) {
+    // get model for reference using the spaceID
+    const defS = spaceDef[getSpaceIndex(spaceID)];
+    // console.log(defS);
     
     // generate a space from the model
     let space = [];
-    if (mod.integer === false) {
+    if (defS.integer === false) {
 
-        if (mod.octant === false) {
+        if (defS.octant === false) {
 
             // positive coordinate field
-            for (let x = 0; x < mod.x; x++) {
-                for (let y = 0; y < mod.y; y++) {
-                    for (let z = 0; z < mod.z; z++) {
+            for (let x = 0; x < defS.x; x++) {
+                for (let y = 0; y < defS.y; y++) {
+                    for (let z = 0; z < defS.z; z++) {
                         // each coordinate point
                         space.push({coor: [x, y, z], open: true});
                     }
@@ -203,13 +239,13 @@ function generateSpace(modelID) {
         } else {
 
             // positive octant coordinate field
-            const xMedian = Math.floor(mod.x / 2);
-            const yMedian = Math.floor(mod.y / 2);
-            const zMedian = Math.floor(mod.z / 2);
+            const xMedian = Math.floor(defS.x / 2);
+            const yMedian = Math.floor(defS.y / 2);
+            const zMedian = Math.floor(defS.z / 2);
 
-            for (let x = 0; x < mod.x; x++) {
-                for (let y = 0; y < mod.y; y++) {
-                    for (let z = 0; z < mod.z; z++) {
+            for (let x = 0; x < defS.x; x++) {
+                for (let y = 0; y < defS.y; y++) {
+                    for (let z = 0; z < defS.z; z++) {
                         // each coordinate point
                         if (x < xMedian && y >= yMedian && z < zMedian) {
                             space.push({coor: [x, y, z], open: true, octant: 1});
@@ -234,12 +270,12 @@ function generateSpace(modelID) {
         
         }
     } else {
-        if (mod.octant === false) {
+        if (defS.octant === false) {
 
             // integer coordinate field
-            for (let x = -(Math.ceil(mod.x / 2)) + 1; x < Math.floor(mod.x / 2) + 1; x++) {
-                for (let y = -(Math.ceil(mod.y / 2)) + 1; y < Math.floor(mod.y / 2) + 1; y++) {
-                    for (let z = -(Math.ceil(mod.z / 2)) + 1; z < Math.floor(mod.z / 2) + 1; z++) {
+            for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
+                for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
+                    for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
                         // each coordinate point
                         space.push({coor: [x, y, z], open: true});
                     }
@@ -249,9 +285,9 @@ function generateSpace(modelID) {
         } else {
 
             // integer octant coordinate field
-            for (let x = -(Math.ceil(mod.x / 2)) + 1; x < Math.floor(mod.x / 2) + 1; x++) {
-                for (let y = -(Math.ceil(mod.y / 2)) + 1; y < Math.floor(mod.y / 2) + 1; y++) {
-                    for (let z = -(Math.ceil(mod.z / 2)) + 1; z < Math.floor(mod.z / 2) + 1; z++) {
+            for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
+                for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
+                    for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
                         // each coordinate point
                         if (x < 0 && y >= 0 && z < 0) {
                             space.push({coor: [x, y, z], open: true, octant: 1});
@@ -276,153 +312,142 @@ function generateSpace(modelID) {
 
         }
     }
-    mod.instances += 1;
-    // console.log({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDstructure)});
-    spaces.push({space: space, modelID: mod.modelID, spaceID: generateID(spaceIDstructure)});
+    defS.instances += 1;
+    models.push({space: space, spaceID: defS.spaceID, modelID: generateID(modelIDstructure), instance: defS.instancecs});
 };
 
-function generateSpacePerModel() {
+function generateModels() {
     // generate single instance of each spatial model defintion
     for (let i = 0; i < spaceDef.length; i++) {
-        generateSpace(spaceDef[i].modelID);
+        generateModel(spaceDef[i].spaceID);
     }
 };
 
-function getSpaceIndex(spaceID) {
-    // search for space index by modelID
-    let spaceIndex = undefined;
-    for (let i = 0; i < spaceDef.length; i++) {
-        if (spaces[i].spaceID === spaceID) {
-            spaceIndex = i;
-            break;
+// Lower-Order Model Operations
+function validCoor(spaceID, x, y, z) {
+    // tests for whether the coordinate exists in the space at spaceID
+    const defS = spaceDef[getSpaceIndex(spaceID)];
+    if (defS.integer === false) {
+        // non integer space
+        if (x >= 0 && x < defS.x && y >= 0 && y < defS.y && z >= 0 && z < defS.z) {
+            // if each coordinate value satasfies the range for that dimension in the model
+            return true;
+        } else {
+            console.log(`No such coordinate in ${defS.name}!`);
+            return false;
+        }
+    } else {
+        // integer space
+        if (x >= -(Math.ceil(defS.x / 2)) + 1 && x < Math.floor(defS.x / 2) + 1 && y >= -(Math.ceil(defS.y / 2)) + 1 && y < Math.floor(defS.y / 2) + 1 && z >= -(Math.ceil(defS.z / 2)) + 1 && z < Math.floor(defS.z / 2) + 1) {
+            // if each coordinate value satasfies the range for that dimension in the model
+            return true;
+        } else {
+            console.log(`No such coordinate in ${defS.name}!`);
+            return false;
         }
     }
-    if (spaceIndex === undefined) {
-        return console.log(`No such space by the spaceID "${spaceID}"!`);
-    } else {
-        return spaceIndex;
-    }
 };
 
-// Spatial Model Operations
-function getPointIndex(spaceID, coordinate, spaceIndex = getSpaceIndex(spaceID)) {
-    const model = spaceDef[getModelIndex(spaces[spaceIndex].modelID)];
-    if (validCoor(model.modelID, coordinate[0], coordinate[1], coordinate[2])) {
-        if (!model.integer) {
+function getPointIndex(modelIndex, x, y, z) {
+    // get space definition
+    const defS = spaceDef[getModelIndex(models[modelIndex].modelID)];
+    if (validCoor(defS.spaceID, x, y, z)) {
+        if (!defS.integer) {
             // positive/non-integer space single point access
             // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
-            return (coordinate[0] * model.y * model.z) + (coordinate[1] * model.z) + coordinate[2];
+            return (x * defS.y * defS.z) + (y * defS.z) + z;
         } else {
             // integer space single point access
             // coordinate to be found
-            const xCoor = coordinate[0];
+            const xCoor = x;
             // number of changes in list
-            const xRange = model.x;
+            const xRange = defS.x;
             // rate of change in list
-            const xRate = model.y * model.z;
+            const xRate = defS.y * defS.z;
             // number of multiples until match
             let xMult = 0;
             // iterate for the number of changes
             for (let i = 0; i < xRange; i++) {
-                // access model at rate of change
-                if (spaces[spaceIndex].space[i * xRate].coor[0] === xCoor) {
+                // access space at rate of change
+                if (models[modelIndex].space[i * xRate].coor[0] === xCoor) {
                     // store number of multiples
                     xMult = i;
                     break;
                 }
             }
-            // console.log(spaces[spaceIndex].space[(xMult * xRate)].coor);
+            // console.log(models[modelIndex].space[(xMult * xRate)].coor);
             
             // coordinate to be found
-            const yCoor = coordinate[1];
+            const yCoor = y;
             // number of changes per x iteration
-            const yRange = model.y;
+            const yRange = defS.y;
             // rate of change in model list
-            const yRate = model.z;
+            const yRate = defS.z;
             // number of multiples until match
             let yMult = 0;
             // iterate for the number of changes
             for (let i = 0; i < yRange; i++) {
                 // access model at rate of change
-                if (spaces[spaceIndex].space[ (xMult * xRate) + (i * yRate) ].coor[1] === yCoor) {
+                if (models[modelIndex].space[ (xMult * xRate) + (i * yRate) ].coor[1] === yCoor) {
                     // store number of multiples
                     yMult = i;
                     break;
                 }
             }
-            // console.log(spaces[spaceIndex].space[(xMult * xRate) + (yMult * yRate)].coor);
+            // console.log(models[modelIndex].space[(xMult * xRate) + (yMult * yRate)].coor);
             
             // coordinate to be found
-            const zCoor = coordinate[2];
+            const zCoor = z;
             // number of changes per y iteration
-            const zRange = model.z;
+            const zRange = defS.z;
             // rate of change in model list = 1 and zMult * 1 = zMult so a variable for zRate is unnecessary
             // number of multiples until match
             let zMult = 0;
             // iterate for the number of changes
             for (let i = 0; i < zRange; i++) {
-                if (spaces[spaceIndex].space[ (xMult * xRate) + (yMult * yRate) + i ].coor[2] === zCoor) {
+                if (models[modelIndex].space[ (xMult * xRate) + (yMult * yRate) + i ].coor[2] === zCoor) {
                     zMult = i;
                 }
             }
-            // console.log(spaces[spaceIndex].space[ (xMult * xRate) + (yMult * yRate) + (zMult) ].coor);
+            // console.log(models[modelIndex].space[ (xMult * xRate) + (yMult * yRate) + (zMult) ].coor);
 
             return (xMult * xRate) + (yMult * yRate) + (zMult);
         }
     }
 };
 
-function readPoint(spaceID, coordinate) {
+function spa(modelID, x, y, z) {
     // single point access
-    const spaceIndex = getSpaceIndex(spaceID);
-    return spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)];
+    const modelIndex = getModelIndex(modelID);
+    return models[modelIndex].space[getPointIndex(modelIndex, x, y, z)];
 };
 
-function openPoint(spaceID, coordinate) {
-    const spaceIndex = getSpaceIndex(spaceID);
-    spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)].open = true;
-};
+// Higher-Order Model Operations
+function transpose(spaceID, from, to) {
+    // tranpose what in where from where to where
+    if (validCoor(spaceID, from[0], from[1], from[2]) && validCoor(spaceID, to[0], to[1], to[2])) {
+        const i =  getObjectIndex(readPoint(spaceID, from).modelID);
+        if (i !== undefined) {
+            const object = objectDef[i];
 
-function closePoint(spaceID, coordinate) {
-    const spaceIndex = getSpaceIndex(spaceID);
-    spaces[spaceIndex].space[getPointIndex(spaceID, coordinate, spaceIndex)].open = false;
-};
-
-// Defintion of object models
-function defineObjectModel(name, x, y, z, quantity) {
-    let mod = {};
-    mod.x = x;
-    mod.y = y;
-    mod.z = z;
-    mod.objectName = name;
-    mod.objectID = generateID(objectIDstructure);
-    mod.quantity = quantity;
-    objectDef.push(mod);
+        }
+    }
 };
 
 /////////////////// PROCESS ///////////////////
 
-// defineSpatialModel("space-1", 10, 10, 10, true, true);
-// defineSpatialModel("space-2", 8, 6, 4);
-
-// generateSpacePerModel();
-// generateSpace(spaceDef[0].modelID);
-// console.log(spaceDef);
-// console.log(spaces);
-
-// closePoint(spaceDef[0].modelID, [1, 2, -3]);
-// console.log(readPoint(spaceDef[0].modelID, [1, 2, -3]));
-// openPoint(spaceDef[0].modelID, [1, 2, -3]);
-// console.log(readPoint(spaceDef[0].modelID, [1, 2, -3]));
-
-// defineObjectModel("object-1", 1, 1, 1, 2);
-// defineObjectModel("object-2", 2, 5, 3, 1);
-// console.log(objectDef);
-
-generateSpatialModels();
-generateSpacePerModel();
+defineSpaces();
 console.log(spaceDef);
-console.log(spaces);
+
+defineObjects();
+console.log(objectDef);
+
+generateModels();
+console.log(models);
+
+console.log(spa(models[0].modelID, 1, 1, 1));
+spa(models[0].modelID, 1, 1, 1).open = false;
+console.log(spa(models[0].modelID, 1, 1, 1));
 
 
 /////////////////// DISPLAY ///////////////////
@@ -603,7 +628,7 @@ function addObstructForm(e) {
     // build a new obstruction
     const obstruct = document.createElement('div');
     obstruct.setAttribute('class', 'obstruction form-layout-block outline');
-    obstruct.setAttribute('id', `obstruct-${generateID(obstructIDstructure)}`);
+    obstruct.setAttribute('id', `obstruct-${generateID(obstructFormIDstructure)}`);
     
     // create components
     const labelX = document.createElement('label');
@@ -656,8 +681,9 @@ function addObstructForm(e) {
 };
 
 function addSpaceForm() {
-    generateID(spaceFormIDstructure);
     // build new space form
+    generateID(spaceFormIDstructure);
+
     const form = document.createElement('div');
     form.setAttribute('class', 'space-form content-highlight2');
     form.setAttribute('id', `space-form-${getID(spaceFormIDstructure)}`);
@@ -670,8 +696,6 @@ function addSpaceForm() {
 
     const integerLegend = document.createElement('legend');
     integerLegend.innerText = 'Select number kind';
-
-    const integerOptions = document.createElement('div');
 
     const labelInt = document.createElement('label');
     labelInt.innerText = 'Integer';
@@ -695,11 +719,10 @@ function addSpaceForm() {
 
     // integer component assemble
     integer.appendChild(integerLegend);
-    integerOptions.appendChild(labelInt);
-    integerOptions.appendChild(optionInt);
-    integerOptions.appendChild(optionPos);
-    integerOptions.appendChild(labelPos);
-    integer.appendChild(integerOptions);
+    integer.appendChild(labelInt);
+    integer.appendChild(optionInt);
+    integer.appendChild(optionPos);
+    integer.appendChild(labelPos);
     
     // octant component
     const octant = document.createElement('fieldset');
@@ -707,8 +730,6 @@ function addSpaceForm() {
 
     const octantLegend = document.createElement('legend');
     octantLegend.innerText = 'Section into octants';
-
-    const octantOptions = document.createElement('div');
 
     const labelTrue = document.createElement('label');
     labelTrue.innerText = 'True';
@@ -732,11 +753,10 @@ function addSpaceForm() {
 
     // assemble octant component
     octant.appendChild(octantLegend);
-    octantOptions.appendChild(labelTrue);
-    octantOptions.appendChild(optionTrue);
-    octantOptions.appendChild(optionFalse);
-    octantOptions.appendChild(labelFalse);
-    octant.appendChild(octantOptions);
+    octant.appendChild(labelTrue);
+    octant.appendChild(optionTrue);
+    octant.appendChild(optionFalse);
+    octant.appendChild(labelFalse);
 
     // Obstructions component
     const obstructions = document.createElement('div');
@@ -777,8 +797,9 @@ function addSpaceForm() {
 };
 
 function addObjectForm() {
-    generateID(objectFormIDstructure);
     // build new object form
+    generateID(objectFormIDstructure);
+    
     const form = document.createElement('div');
     form.setAttribute('class', 'object-form content-highlight2');
     form.setAttribute('id', `object-form-${getID(objectFormIDstructure)}`);
