@@ -478,20 +478,17 @@ spa(models[0].modelID, 4, 4, 4).objectID = objectDef[0].objectID;
 
 // console.log(scan(models[0].space, sector1));
 // console.log(scan(models[0].space, sector2));
-// console.log(scan(models[0], sector3));
-// console.log(scan(models[0], sector4));
-// console.log(scan(models[0], sector5));
-// console.log(scan(models[0], sector6));
-// console.log(scan(models[0], sector7));
-// console.log(scan(models[0], sector8));
+// console.log(scan(models[0].space, sector3));
+// console.log(scan(models[0].space, sector4));
+// console.log(scan(models[0].space, sector5));
+// console.log(scan(models[0].space, sector6));
+// console.log(scan(models[0].space, sector7));
+// console.log(scan(models[0].space, sector8));
+
 console.log(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)));
 console.log(scan(models[0].space, identifyObject, objectDef[0].objectID));
 console.log(scan(scan(models[0].space, identifyObject, objectDef[0].objectID), sector1));
 console.log(scan(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)), identifyObject, objectDef[0].objectID));
-// console.log(scan( scan(models[0].space, sector1)), identifyObject, objectDef[0].objectID );
-
-// console.log(scan(models[0].modelID, object, objectDef[0].objectID));
-// scan(models[0].modelID, object, objectDef[0].objectID);
 
 /////////////////// DISPLAY ///////////////////
 // form component functions
@@ -726,10 +723,10 @@ function addObstructForm(e) {
 function addSpaceForm() {
     // build new space form
     generateID(spaceFormIDstructure);
-
+    const formID = getID(spaceFormIDstructure);
     const form = document.createElement('div');
     form.setAttribute('class', 'space-form content-highlight2');
-    form.setAttribute('id', `space-form-${getID(spaceFormIDstructure)}`);
+    form.setAttribute('id', `space-form-${formID}`);
 
     // create components
 
@@ -738,7 +735,7 @@ function addSpaceForm() {
     integer.setAttribute('class', 'center-flex');
 
     const integerLegend = document.createElement('legend');
-    integerLegend.innerText = 'Select number kind';
+    integerLegend.innerText = 'Number Type';
 
     const labelInt = document.createElement('label');
     labelInt.innerText = 'Integer';
@@ -767,39 +764,44 @@ function addSpaceForm() {
     integer.appendChild(optionPos);
     integer.appendChild(labelPos);
     
-    // octant component
-    const octant = document.createElement('fieldset');
-    octant.setAttribute('class', 'center-flex');
+    // sector component
+    const sector = document.createElement('fieldset');
+    sector.setAttribute('class', 'center-flex');
 
-    const octantLegend = document.createElement('legend');
-    octantLegend.innerText = 'Section into octants';
+    const sectorLegend = document.createElement('legend');
+    sectorLegend.innerText = 'Sectors';
 
-    const labelTrue = document.createElement('label');
-    labelTrue.innerText = 'True';
+    const select = document.createElement('select');
+    select.setAttribute('id', `${formID}`);
 
-    const optionTrue = document.createElement('input');
-    optionTrue.setAttribute('type', 'radio');
-    optionTrue.setAttribute('name', 'octant');
-    optionTrue.setAttribute('class', 'octant cursor-pointer');
-    optionTrue.setAttribute('value', 'true');
-    optionTrue.setAttribute('required', true);
+    const option1 = document.createElement('option');
+    option1.setAttribute('value', '1');
+    option1.innerText = '(0) None';
     
-    const labelFalse = document.createElement('label');
-    labelFalse.innerText = 'False';
+    const option2 = document.createElement('option');
+    option2.setAttribute('value', '2');
+    option2.innerText = '(2) Semisector';
+    
+    const option3 = document.createElement('option');
+    option3.setAttribute('value', '4');
+    option3.innerText = '(4) Quadrant';
+    
+    const option4 = document.createElement('option');
+    option4.setAttribute('value', '6');
+    option4.innerText = '(6) Sextant';
 
-    const optionFalse = document.createElement('input');
-    optionFalse.setAttribute('type', 'radio');
-    optionFalse.setAttribute('name', 'octant');
-    optionFalse.setAttribute('class', 'octant cursor-pointer');
-    optionFalse.setAttribute('value', 'false');
-    optionFalse.setAttribute('required', true);
+    const option5 = document.createElement('option');
+    option5.setAttribute('value', '8');
+    option5.innerText = '(8) Octant';
 
-    // assemble octant component
-    octant.appendChild(octantLegend);
-    octant.appendChild(labelTrue);
-    octant.appendChild(optionTrue);
-    octant.appendChild(optionFalse);
-    octant.appendChild(labelFalse);
+    // assemble sector component
+    sector.appendChild(sectorLegend);
+    select.appendChild(option1);
+    select.appendChild(option2);
+    select.appendChild(option3);
+    select.appendChild(option4);
+    select.appendChild(option5);
+    sector.appendChild(select);
 
     // Obstructions component
     const obstructions = document.createElement('div');
@@ -819,13 +821,13 @@ function addSpaceForm() {
     ObstructBTNcontainer.appendChild(obstructBTN);
 
     // assemble components into form
-    form.appendChild(titleComponent(`Space ${getID(spaceFormIDstructure)}`));
+    form.appendChild(titleComponent(`Space ${formID}`));
     form.appendChild(addBreak());
     form.appendChild(dimensionsComponent("space"));
     form.appendChild(addBreak());
     form.appendChild(integer);
     form.appendChild(addBreak());
-    form.appendChild(octant);
+    form.appendChild(sector);
     form.appendChild(addBreak());
     form.appendChild(titleComponent('Obstructions'));
     form.appendChild(addBreak());
