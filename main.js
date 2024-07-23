@@ -22,6 +22,15 @@ const addSpaceBTN = panel.querySelector('#btn-add-space');
 const addObstructBTN = spaceFormContainer.querySelector('.btn-add-obstruct');
 const addObjectBTN = panel.querySelector('#btn-add-object');
 
+/////////////////// OPERATIONS ///////////////////
+function round(x) {
+    if (x % 1 < 0.5) {
+        return Math.floor(x); // round down
+    } else {
+        return Math.ceil(x); // round up
+    }
+};
+
 /////////////////// MODEL ///////////////////
 // System of Identification
 let spaceIDstructure = [0];
@@ -130,7 +139,8 @@ function getModelIndex(modelID) {
 };
 
 // Defintion of Spaces
-function defineSpace(name, x, y, z, integer = false, octant = false, obstruct = []) {
+function defineSpace(name, x, y, z, integer = false, sectors = 1, obstruct = []) {
+    // build spatial defintion
     let def = {};
     def.spaceID = generateID(spaceIDstructure);
     def.instances = 0;
@@ -145,7 +155,7 @@ function defineSpace(name, x, y, z, integer = false, octant = false, obstruct = 
     } else {
         def.cubic = false;
     }
-    def.octant = octant;
+    def.sectors = Number(sectors);
     def.volume = x * y * z;
     spaceDef.push(def);
 };
@@ -168,16 +178,7 @@ function defineSpaces() {
                 }
             }
         });
-        let octant;
-        form.querySelectorAll('.octant').forEach((option) => {
-            if (option.checked === true) {
-                if (option.value === "true") {
-                    octant = true;
-                } else {
-                    octant = false;
-                }
-            }
-        });
+        let sectors = form.querySelector(`#sectors-${form.id.slice(11)}`).value;
         // obstructions
         let obstruct = [];
         form.querySelectorAll('.obstruction').forEach((o) => {
@@ -187,7 +188,7 @@ function defineSpaces() {
             obstruct.push([x, y, z]);
         });
         // pass info as arguments into defineSpaces function
-        defineSpace(name, x, y, z, integer, octant, obstruct);
+        defineSpace(name, x, y, z, integer, sectors, obstruct);
     });
 };
 
@@ -218,102 +219,43 @@ function defineObjects() {
 function generateModel(spaceID) {
     // get model for reference using the spaceID
     const defS = spaceDef[getSpaceIndex(spaceID)];
-    // console.log(defS);
-    
     // generate a space from the model
     let space = [];
-    if (defS.integer === false) {
-
-        if (defS.octant === false) {
-
-            // positive coordinate field
-            for (let x = 0; x < defS.x; x++) {
-                for (let y = 0; y < defS.y; y++) {
-                    for (let z = 0; z < defS.z; z++) {
-                        // each coordinate point
-                        space.push({coor: [x, y, z], open: true});
-                    }
+    if (defS.integer === true) {
+        // integer coordinate field
+        for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
+            for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
+                for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
+                    // each coordinate point
+                    space.push({coor: [x, y, z], objectID: ""});
                 }
             }
-
-        } else {
-
-            // positive octant coordinate field
-            const xMedian = Math.floor(defS.x / 2);
-            const yMedian = Math.floor(defS.y / 2);
-            const zMedian = Math.floor(defS.z / 2);
-
-            for (let x = 0; x < defS.x; x++) {
-                for (let y = 0; y < defS.y; y++) {
-                    for (let z = 0; z < defS.z; z++) {
-                        // each coordinate point
-                        if (x < xMedian && y >= yMedian && z < zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 1});
-                        } else if (x >= xMedian && y >= yMedian && z < zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 2});
-                        } else if (x >= xMedian && y < yMedian && z < zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 3});
-                        } else if (x < xMedian && y < yMedian && z < zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 4});
-                        } else if (x < xMedian && y >= yMedian && z >= zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 5});
-                        } else if (x >= xMedian && y >= yMedian && z >= zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 6});
-                        } else if (x >= xMedian && y < yMedian && z >= zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 7});
-                        } else if (x < xMedian && y < yMedian && z >= zMedian) {
-                            space.push({coor: [x, y, z], open: true, octant: 8});
-                        }
-                    }
-                }
-            }
-        
         }
     } else {
-        if (defS.octant === false) {
-
-            // integer coordinate field
-            for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
-                for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
-                    for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
-                        // each coordinate point
-                        space.push({coor: [x, y, z], open: true});
-                    }
+        // positive coordinate field
+        for (let x = 0; x < defS.x; x++) {
+            for (let y = 0; y < defS.y; y++) {
+                for (let z = 0; z < defS.z; z++) {
+                    // each coordinate point
+                    space.push({coor: [x, y, z], objectID: ""});
                 }
             }
-
-        } else {
-
-            // integer octant coordinate field
-            for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
-                for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
-                    for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
-                        // each coordinate point
-                        if (x < 0 && y >= 0 && z < 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 1});
-                        } else if (x >= 0 && y >= 0 && z < 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 2});
-                        } else if (x >= 0 && y < 0 && z < 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 3});
-                        } else if (x < 0 && y < 0 && z < 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 4});
-                        } else if (x < 0 && y >= 0 && z >= 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 5});
-                        } else if (x >= 0 && y >= 0 && z >= 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 6});
-                        } else if (x >= 0 && y < 0 && z >= 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 7});
-                        } else if (x < 0 && y < 0 && z >= 0) {
-                            space.push({coor: [x, y, z], open: true, octant: 8});
-                        }
-                    }
-                }
+        }
+    }
+    // add sector data to points
+    if (defS.sectors > 1) {
+        const sections = defS.sectors;
+        const sectionVolume = Math.floor(defS.volume / sections);
+        let sect = 0;
+        for (let i = 0; i < space.length; i++) {
+            if (i / sectionVolume % 1 === 0 && i / sectionVolume !== sections) {
+                sect += 1;
             }
-
+            space[i].sector = sect;
         }
     }
     defS.instances += 1;
-    models.push({space: space, spaceID: defS.spaceID, modelID: generateID(modelIDstructure), instance: defS.instancecs});
+    models.push({space: space, spaceID: defS.spaceID, modelID: generateID(modelIDstructure), instance: defS.instances});
 };
 
 function generateModels() {
@@ -350,7 +292,7 @@ function validCoor(spaceID, x, y, z) {
 
 function getPointIndex(modelIndex, x, y, z) {
     // get space definition
-    const defS = spaceDef[getModelIndex(models[modelIndex].modelID)];
+    const defS = spaceDef[getSpaceIndex(models[modelIndex].spaceID)];
     if (validCoor(defS.spaceID, x, y, z)) {
         if (!defS.integer) {
             // positive/non-integer space single point access
@@ -416,23 +358,104 @@ function getPointIndex(modelIndex, x, y, z) {
     }
 };
 
+// Single Point Access
 function spa(modelID, x, y, z) {
-    // single point access
     const modelIndex = getModelIndex(modelID);
     return models[modelIndex].space[getPointIndex(modelIndex, x, y, z)];
 };
 
-// Higher-Order Model Operations
-function transpose(spaceID, from, to) {
-    // tranpose what in where from where to where
-    if (validCoor(spaceID, from[0], from[1], from[2]) && validCoor(spaceID, to[0], to[1], to[2])) {
-        const i =  getObjectIndex(readPoint(spaceID, from).modelID);
-        if (i !== undefined) {
-            const object = objectDef[i];
-
+// Full Model Scanning
+function scan(modelID, test, id) {
+    // scans all points in a model's space
+    const s = models[getModelIndex(modelID)].space;
+    let result = [];
+    let x = 0;
+    for (let i = 0; i < s.length; i++) {
+        x += 1;
+        if (test(s[i], id)) {
+            result.push({index: i, point: s[i]});
         }
     }
+    return result;
 };
+
+// tests
+function object(point, objectID) {
+    if (point.objectID === objectID) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector1(point) {
+    if (point.sector === 1) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector2(point) {
+    if (point.sector === 2) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector3(point) {
+    if (point.sector === 3) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector4(point) {
+    if (point.sector === 4) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector5(point) {
+    if (point.sector === 5) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector6(point) {
+    if (point.sector === 6) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector7(point) {
+    if (point.sector === 7) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function sector8(point) {
+    if (point.sector === 8) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+
+// Higher-Order Model Operations
+
+// function transpose(modelID, from, to) {
+//     // tranpose what in where from where to where
+//     if (validCoor(spaceID, from[0], from[1], from[2]) && validCoor(spaceID, to[0], to[1], to[2])) {
+//         const i =  getObjectIndex(readPoint(spaceID, from).modelID);
+//         if (i !== undefined) {
+//             const object = objectDef[i];
+//         }
+//     }
+// };
 
 /////////////////// PROCESS ///////////////////
 
@@ -440,15 +463,28 @@ defineSpaces();
 console.log(spaceDef);
 
 defineObjects();
-console.log(objectDef);
+// console.log(objectDef);
 
-generateModels();
+generateModel(spaceDef[0].spaceID);
 console.log(models);
 
-console.log(spa(models[0].modelID, 1, 1, 1));
-spa(models[0].modelID, 1, 1, 1).open = false;
-console.log(spa(models[0].modelID, 1, 1, 1));
+// spa(models[0].modelID, 0, 0, 0).objectID = objectDef[0].objectID;
+// spa(models[0].modelID, 1, 1, 1).objectID = objectDef[0].objectID;
+// spa(models[0].modelID, 2, 2, 2).objectID = objectDef[0].objectID;
+// spa(models[0].modelID, 3, 3, 3).objectID = objectDef[0].objectID;
+// spa(models[0].modelID, 4, 4, 4).objectID = objectDef[0].objectID;
 
+console.log(scan(models[0].modelID, sector1));
+console.log(scan(models[0].modelID, sector2));
+console.log(scan(models[0].modelID, sector3));
+console.log(scan(models[0].modelID, sector4));
+console.log(scan(models[0].modelID, sector5));
+console.log(scan(models[0].modelID, sector6));
+console.log(scan(models[0].modelID, sector7));
+console.log(scan(models[0].modelID, sector8));
+
+// console.log(scan(models[0].modelID, object, objectDef[0].objectID));
+// scan(models[0].modelID, object, objectDef[0].objectID);
 
 /////////////////// DISPLAY ///////////////////
 // form component functions
