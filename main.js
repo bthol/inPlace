@@ -242,6 +242,10 @@ function generateModel(spaceID) {
             }
         }
     }
+    // add spatial index data to points
+    for (let i = 0; i < space.length; i++) {
+        space[i].spaceIndex = i;
+    }
     // add sector data to points
     if (defS.sectors > 1) {
         const sections = defS.sectors;
@@ -365,28 +369,19 @@ function spa(modelID, x, y, z) {
 };
 
 // Full Model Scanning
-function scan(modelID, test, id) {
-    // scans all points in a model's space
-    const s = models[getModelIndex(modelID)].space;
+function scan(space, test, id) {
+    // scans every point in a model's space
     let result = [];
-    let x = 0;
-    for (let i = 0; i < s.length; i++) {
-        x += 1;
-        if (test(s[i], id)) {
-            result.push({index: i, point: s[i]});
+    for (let i = 0; i < space.length; i++) {
+        const point = space[i];
+        if (test(point, id)) {
+            result.push(point);
         }
     }
     return result;
 };
 
 // tests
-function object(point, objectID) {
-    if (point.objectID === objectID) {
-        return true;
-    } else {
-        return false;
-    }
-};
 function sector1(point) {
     if (point.sector === 1) {
         return true;
@@ -443,6 +438,13 @@ function sector8(point) {
         return false;
     }
 };
+function identifyObject(point, objectID) {
+    if (point.objectID === objectID) {
+        return true;
+    } else {
+        return false;
+    }
+};
 
 
 // Higher-Order Model Operations
@@ -468,20 +470,25 @@ defineObjects();
 generateModel(spaceDef[0].spaceID);
 console.log(models);
 
-// spa(models[0].modelID, 0, 0, 0).objectID = objectDef[0].objectID;
-// spa(models[0].modelID, 1, 1, 1).objectID = objectDef[0].objectID;
-// spa(models[0].modelID, 2, 2, 2).objectID = objectDef[0].objectID;
-// spa(models[0].modelID, 3, 3, 3).objectID = objectDef[0].objectID;
-// spa(models[0].modelID, 4, 4, 4).objectID = objectDef[0].objectID;
+spa(models[0].modelID, 0, 0, 0).objectID = objectDef[0].objectID;
+spa(models[0].modelID, 1, 1, 1).objectID = objectDef[0].objectID;
+spa(models[0].modelID, 2, 2, 2).objectID = objectDef[0].objectID;
+spa(models[0].modelID, 3, 3, 3).objectID = objectDef[0].objectID;
+spa(models[0].modelID, 4, 4, 4).objectID = objectDef[0].objectID;
 
-console.log(scan(models[0].modelID, sector1));
-console.log(scan(models[0].modelID, sector2));
-console.log(scan(models[0].modelID, sector3));
-console.log(scan(models[0].modelID, sector4));
-console.log(scan(models[0].modelID, sector5));
-console.log(scan(models[0].modelID, sector6));
-console.log(scan(models[0].modelID, sector7));
-console.log(scan(models[0].modelID, sector8));
+// console.log(scan(models[0].space, sector1));
+// console.log(scan(models[0].space, sector2));
+// console.log(scan(models[0], sector3));
+// console.log(scan(models[0], sector4));
+// console.log(scan(models[0], sector5));
+// console.log(scan(models[0], sector6));
+// console.log(scan(models[0], sector7));
+// console.log(scan(models[0], sector8));
+console.log(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)));
+console.log(scan(models[0].space, identifyObject, objectDef[0].objectID));
+console.log(scan(scan(models[0].space, identifyObject, objectDef[0].objectID), sector1));
+console.log(scan(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)), identifyObject, objectDef[0].objectID));
+// console.log(scan( scan(models[0].space, sector1)), identifyObject, objectDef[0].objectID );
 
 // console.log(scan(models[0].modelID, object, objectDef[0].objectID));
 // scan(models[0].modelID, object, objectDef[0].objectID);
