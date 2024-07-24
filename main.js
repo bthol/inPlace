@@ -227,7 +227,7 @@ function generateModel(spaceID) {
             for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
                 for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
                     // each coordinate point
-                    space.push({coor: [x, y, z], objectID: ""});
+                    space.push({coor: [x, y, z], objectID: "", open: true});
                 }
             }
         }
@@ -237,7 +237,7 @@ function generateModel(spaceID) {
             for (let y = 0; y < defS.y; y++) {
                 for (let z = 0; z < defS.z; z++) {
                     // each coordinate point
-                    space.push({coor: [x, y, z], objectID: ""});
+                    space.push({coor: [x, y, z], objectID: "", open: true});
                 }
             }
         }
@@ -259,7 +259,17 @@ function generateModel(spaceID) {
         }
     }
     defS.instances += 1;
-    models.push({space: space, spaceID: defS.spaceID, modelID: generateID(modelIDstructure), instance: defS.instances});
+    models.push({
+        space: space,
+        modelID: generateID(modelIDstructure),
+        instance: defS.instances,
+        x: defS.x,
+        y: defS.y,
+        z: defS.z,
+        volume: defS.volume,
+        integer: defS.integer,
+        spaceID: defS.spaceID,
+    });
 };
 
 function generateModels() {
@@ -270,12 +280,12 @@ function generateModels() {
 };
 
 // Lower-Order Model Operations
-function validCoor(spaceID, x, y, z) {
+function validCoor(model, x, y, z) {
     // tests for whether the coordinate exists in the space at spaceID
-    const defS = spaceDef[getSpaceIndex(spaceID)];
-    if (defS.integer === false) {
-        // non integer space
-        if (x >= 0 && x < defS.x && y >= 0 && y < defS.y && z >= 0 && z < defS.z) {
+    const defS = model;
+    if (defS.integer === true) {
+        // integer space
+        if (x >= -(Math.ceil(defS.x / 2)) + 1 && x < Math.floor(defS.x / 2) + 1 && y >= -(Math.ceil(defS.y / 2)) + 1 && y < Math.floor(defS.y / 2) + 1 && z >= -(Math.ceil(defS.z / 2)) + 1 && z < Math.floor(defS.z / 2) + 1) {
             // if each coordinate value satasfies the range for that dimension in the model
             return true;
         } else {
@@ -283,8 +293,8 @@ function validCoor(spaceID, x, y, z) {
             return false;
         }
     } else {
-        // integer space
-        if (x >= -(Math.ceil(defS.x / 2)) + 1 && x < Math.floor(defS.x / 2) + 1 && y >= -(Math.ceil(defS.y / 2)) + 1 && y < Math.floor(defS.y / 2) + 1 && z >= -(Math.ceil(defS.z / 2)) + 1 && z < Math.floor(defS.z / 2) + 1) {
+        // positive space
+        if (x >= 0 && x < defS.x && y >= 0 && y < defS.y && z >= 0 && z < defS.z) {
             // if each coordinate value satasfies the range for that dimension in the model
             return true;
         } else {
@@ -295,15 +305,19 @@ function validCoor(spaceID, x, y, z) {
 };
 
 function getPointIndex(modelIndex, x, y, z) {
-    // get space definition
-    const defS = spaceDef[getSpaceIndex(models[modelIndex].spaceID)];
-    if (validCoor(defS.spaceID, x, y, z)) {
+    if (validCoor(models[modelIndex], x, y, z)) {
+        // get space definition
+        const defS = models[modelIndex];
+
         if (!defS.integer) {
+
             // positive/non-integer space single point access
-            // variableNameStoringModels[ index of spatial model ][ index of object in that model ];
+
             return (x * defS.y * defS.z) + (y * defS.z) + z;
         } else {
+
             // integer space single point access
+
             // coordinate to be found
             const xCoor = x;
             // number of changes in list
@@ -359,18 +373,25 @@ function getPointIndex(modelIndex, x, y, z) {
 
             return (xMult * xRate) + (yMult * yRate) + (zMult);
         }
+    } else {
+        return false;
     }
 };
 
 // Single Point Access
-function spa(modelID, x, y, z) {
-    const modelIndex = getModelIndex(modelID);
-    return models[modelIndex].space[getPointIndex(modelIndex, x, y, z)];
+function spa(modelIndex, x, y, z) {
+    // returns a single point object
+    const pointIndex = getPointIndex(modelIndex, x, y, z);
+    if (pointIndex !== false) {
+        return models[modelIndex].space[pointIndex];
+    } else {
+        return false;
+    }
 };
 
 // Full Model Scanning
-function scan(space, test, id) {
-    // scans every point in a model's space
+function fullScan(space, test, id) {
+    // scans every point in a model's space to return a part
     let result = [];
     for (let i = 0; i < space.length; i++) {
         const point = space[i];
@@ -379,6 +400,77 @@ function scan(space, test, id) {
         }
     }
     return result;
+};
+
+// Focus Scan
+function focusScan(modelIndex, test, xi, xf, yi, yf, zi, zf, id) {
+    // uses single point access to test all points in a specified region of a space
+    let xRange = xf - xi;
+    if (xRange === 0) { // for no change
+        // prevent multiplication by zero
+        xRange = 1; 
+    }
+    let yRange = yf - yi;
+    if (yRange === 0) { // for no change
+        // prevent multiplication by zero
+        yRange = 1;
+    }
+    let zRange = zf - zi;
+    if (zRange === 0) { // for no change
+        // prevent multiplication by zero
+        zRange = 1;
+    }
+    const volume = Math.abs(xRange * yRange * zRange);
+    if (volume < 1000) { // no more than 1000 points per focusScan
+        // determine starting value for incrimental interation
+        let xStart, xEnd, yStart, yEnd, zStart, zEnd;
+        if (xRange === 1) { // no range?
+            xStart = xi;
+            xEnd = xi + 1; //  make 1
+        } else if (xRange > 0) { // positive diff
+            xStart = xi; // start with initial
+            xEnd = xf;
+        } else { // negative diff
+            xStart = xf; // start with final
+            xEnd = xi;
+        }
+        if (yRange === 1) { // no range?
+            yStart = yi;
+            yEnd = yi + 1; //  make 1
+        } else if (yRange > 0) { // positive diff
+            yStart = yi; // start with initial
+            yEnd = yf;
+        } else { // negative diff
+            yStart = yf; // start with final
+            yEnd = yi;
+        }
+        if (zRange === 1) { // no range? make 1
+            zStart = zi; 
+            zEnd = zi + 1; //  make 1
+        } else if (zRange > 0) { // positive diff
+            zStart = zi; // start with initial
+            zEnd = zf;
+        } else { // negative diff
+            zStart = zf; // start with final
+            zEnd = zi;
+        }
+        // search within ranges with spa
+        for (let i = xStart; i < xEnd; i++) {
+            for (let j = yStart; j < yEnd; j++) {
+                for (let k = zStart; k < zEnd; k++) {
+                    // spa will validate point + assign the point if valid or false if invalid
+                    const point = spa(modelIndex, i, j, k);
+                    if (point !== false && test(point, id)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    } else {
+        console.log(`Error: focusScan can only scan under 1000 points at a time. Attempted ${Math.abs(volume - 1000)} points more than permitted.`);
+        return false;
+    }
 };
 
 // tests
@@ -445,17 +537,27 @@ function identifyObject(point, objectID) {
         return false;
     }
 };
-
+function open(point) {
+    if (point.open === true) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function unopen(point) {
+    if (point.open === false) {
+        return true;
+    } else {
+        return false;
+    }
+};
 
 // Higher-Order Model Operations
 
-// function transpose(modelID, from, to) {
+// function transpose(objectID, modelID, x, y, z) {
 //     // tranpose what in where from where to where
-//     if (validCoor(spaceID, from[0], from[1], from[2]) && validCoor(spaceID, to[0], to[1], to[2])) {
-//         const i =  getObjectIndex(readPoint(spaceID, from).modelID);
-//         if (i !== undefined) {
-//             const object = objectDef[i];
-//         }
+//     if (validCoor(models[getModelIndex(modelID)], x, y, z)) {
+        
 //     }
 // };
 
@@ -465,30 +567,32 @@ defineSpaces();
 console.log(spaceDef);
 
 defineObjects();
-// console.log(objectDef);
+console.log(objectDef);
 
 generateModel(spaceDef[0].spaceID);
 console.log(models);
 
-spa(models[0].modelID, 0, 0, 0).objectID = objectDef[0].objectID;
-spa(models[0].modelID, 1, 1, 1).objectID = objectDef[0].objectID;
-spa(models[0].modelID, 2, 2, 2).objectID = objectDef[0].objectID;
-spa(models[0].modelID, 3, 3, 3).objectID = objectDef[0].objectID;
-spa(models[0].modelID, 4, 4, 4).objectID = objectDef[0].objectID;
+spa(0, 0, 2, 1).open = false;
+spa(0, 0, 3, 1).open = false;
+spa(0, 0, 4, 1).open = false;
+spa(0, 0, 4, 2).open = false;
 
-// console.log(scan(models[0].space, sector1));
-// console.log(scan(models[0].space, sector2));
-// console.log(scan(models[0].space, sector3));
-// console.log(scan(models[0].space, sector4));
-// console.log(scan(models[0].space, sector5));
-// console.log(scan(models[0].space, sector6));
-// console.log(scan(models[0].space, sector7));
-// console.log(scan(models[0].space, sector8));
+console.log(fullScan(models[0].space, unopen));
+console.log(focusScan(0, unopen, 0, 0, 2, 4, 1, 2));
 
-console.log(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)));
-console.log(scan(models[0].space, identifyObject, objectDef[0].objectID));
-console.log(scan(scan(models[0].space, identifyObject, objectDef[0].objectID), sector1));
-console.log(scan(scan(models[0].space, sector1).concat(scan(models[0].space, sector2)), identifyObject, objectDef[0].objectID));
+// console.log(fullScan(models[0].space, sector1));
+// console.log(fullScan(models[0].space, sector2));
+// console.log(fullScan(models[0].space, sector3));
+// console.log(fullScan(models[0].space, sector4));
+// console.log(fullScan(models[0].space, sector5));
+// console.log(fullScan(models[0].space, sector6));
+// console.log(fullScan(models[0].space, sector7));
+// console.log(fullScan(models[0].space, sector8));
+
+// console.log(fullScan(models[0].space, identifyObject, objectDef[0].objectID));
+// console.log(fullScan(models[0].space, sector1).concat(fullScan(models[0].space, sector2)));
+// console.log(fullScan(fullScan(models[0].space, identifyObject, objectDef[0].objectID), sector1));
+// console.log(fullScan(fullScan(models[0].space, sector1).concat(fullScan(models[0].space, sector2)), identifyObject, objectDef[0].objectID));
 
 /////////////////// DISPLAY ///////////////////
 // form component functions
