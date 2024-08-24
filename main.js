@@ -33,14 +33,16 @@ function round(x) {
 
 /////////////////// MODEL ///////////////////
 // System of Identification
-let spaceIDstructure = [0];
-let objectIDstructure = [0];
+let spaceDefIDstructure = [0]; // spaceDefID
+let objectDefIDstructure = [0]; // objectDefID
 
-let modelIDstructure = [0];
+let objectIDstructure = [0]; // objectID
+let modelIDstructure = [0]; // modelID
 
-let spaceFormIDstructure = [0];
-let obstructFormIDstructure = [0];
-let objectFormIDstructure = [0];
+// unique form id and info 
+let spaceFormIDstructure = [0]; 
+let obstructFormIDstructure = [0]; 
+let objectFormIDstructure = [0]; 
 
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" ];
 
@@ -86,36 +88,37 @@ function getID(structure) {
 // Data Structures
 let spaceDef = [];
 let objectDef = [];
+let objectQueue = [];
 let models = [];
 
 // Structural Access Functionality
-function getSpaceIndex(spaceID) {
-    // search for space index by spaceID
+function getSpaceDefIndex(spaceDefID) {
+    // search for space index by spaceDefID
     let spaceIndex = undefined;
     for (let i = 0; i < spaceDef.length; i++) {
-        if (spaceDef[i].spaceID === spaceID) {
+        if (spaceDef[i].spaceDefID === spaceDefID) {
             spaceIndex = i;
             break;
         }
     }
     if (spaceIndex === undefined) {
-        return console.log(`No such space by the spaceID "${spaceID}"!`);
+        return console.log(`No such space by the spaceDefID "${spaceDefID}"!`);
     } else {
         return spaceIndex;
     }
 };
 
-function getObjectIndex(objectID) {
-    // search for object index by objectID
+function getObjectDefIndex(objectDefID) {
+    // search for object index by objectDefID
     let objectIndex = undefined;
     for (let i = 0; i < objectDef.length; i++) {
-        if (objectDef[i].objectID === objectID) {
+        if (objectDef[i].objectDefID === objectDefID) {
             objectIndex = i;
             break;
         }
     }
     if (objectIndex === undefined) {
-        console.log(`No such object by the objectID "${objectID}"!`);
+        console.log(`No such object by the objectDefID "${objectDefID}"!`);
         return objectIndex;
     } else {
         return objectIndex;
@@ -142,7 +145,7 @@ function getModelIndex(modelID) {
 function defineSpace(name, x, y, z, integer = false, sectors = 1, obstruct = []) {
     // build spatial defintion
     let def = {};
-    def.spaceID = generateID(spaceIDstructure);
+    def.spaceDefID = generateID(spaceDefIDstructure);
     def.instances = 0;
     def.integer = integer;
     def.name = name;
@@ -198,8 +201,9 @@ function defineObject(name, x, y, z, quantity) {
     mod.x = x;
     mod.y = y;
     mod.z = z;
+    mod.volume = x * y * z;
     mod.objectName = name;
-    mod.objectID = generateID(objectIDstructure);
+    mod.objectDefID = generateID(objectDefIDstructure);
     mod.quantity = quantity;
     objectDef.push(mod);
 };
@@ -215,41 +219,67 @@ function defineObjects() {
     });
 };
 
+// Object Generation
+function generateObject(objectDef) {
+    // generate object and store in queue structure
+    let object = {
+        objectID: `${objectDef.objectDefID}-${generateID(objectIDstructure)}`,
+        x: objectDef.x,
+        y: objectDef.y,
+        z: objectDef.z,
+        volume: objectDef.volume,
+    };
+    let coordinates = [];
+    for (let x = 0; x < object.x; x++) {
+        for (let y = 0; y < object.y; y++) {
+            for (let z = 0; z < object.z; z++) {
+                coordinates.push([x, y, z]);
+            }
+        }
+    }
+    object.coors = coordinates;
+    objectQueue.push(object);
+};
+
+function generateObjects() {
+    // generate single instance of each object defintion
+    for (let i = 0; i < objectDef.length; i++) {
+        generateModel(objectDef[i].obnjectDefID);
+    }
+};
+
 // Model Generation
-function generateModel(spaceID) {
-    // get model for reference using the spaceID
-    const defS = spaceDef[getSpaceIndex(spaceID)];
-    // generate a space from the model
+function generateModel(spaceDef) {
+    // generate coordinates with correct number type 
     let space = [];
-    if (defS.integer === true) {
-        // integer coordinate field
-        for (let x = -(Math.ceil(defS.x / 2)) + 1; x < Math.floor(defS.x / 2) + 1; x++) {
-            for (let y = -(Math.ceil(defS.y / 2)) + 1; y < Math.floor(defS.y / 2) + 1; y++) {
-                for (let z = -(Math.ceil(defS.z / 2)) + 1; z < Math.floor(defS.z / 2) + 1; z++) {
-                    // each coordinate point
+    if (spaceDef.integer === true) {
+        // integer coordinate field 
+        for (let x = -(Math.ceil(spaceDef.x / 2)) + 1; x < Math.floor(spaceDef.x / 2) + 1; x++) {
+            for (let y = -(Math.ceil(spaceDef.y / 2)) + 1; y < Math.floor(spaceDef.y / 2) + 1; y++) {
+                for (let z = -(Math.ceil(spaceDef.z / 2)) + 1; z < Math.floor(spaceDef.z / 2) + 1; z++) {
+                    // each coordinate point 
                     space.push({coor: [x, y, z], objectID: "", open: true});
                 }
             }
         }
     } else {
-        // positive coordinate field
-        for (let x = 0; x < defS.x; x++) {
-            for (let y = 0; y < defS.y; y++) {
-                for (let z = 0; z < defS.z; z++) {
-                    // each coordinate point
+        // positive coordinate field 
+        for (let x = 0; x < spaceDef.x; x++) {
+            for (let y = 0; y < spaceDef.y; y++) {
+                for (let z = 0; z < spaceDef.z; z++) {
                     space.push({coor: [x, y, z], objectID: "", open: true});
                 }
             }
         }
     }
-    // add spatial index data to points
+    // add spatial index data to points 
     for (let i = 0; i < space.length; i++) {
         space[i].spaceIndex = i;
     }
-    // add sector data to points
-    if (defS.sectors > 1) {
-        const sections = defS.sectors;
-        const sectionVolume = Math.floor(defS.volume / sections);
+    // add sector data to points 
+    if (spaceDef.sectors > 1) {
+        const sections = spaceDef.sectors;
+        const sectionVolume = Math.floor(spaceDef.volume / sections);
         let sect = 0;
         for (let i = 0; i < space.length; i++) {
             if (i / sectionVolume % 1 === 0 && i / sectionVolume !== sections) {
@@ -258,47 +288,68 @@ function generateModel(spaceID) {
             space[i].sector = sect;
         }
     }
-    defS.instances += 1;
+    // add model to models structure
+    spaceDef.instances += 1;
     models.push({
-        space: space,
         modelID: generateID(modelIDstructure),
-        instance: defS.instances,
-        x: defS.x,
-        y: defS.y,
-        z: defS.z,
-        volume: defS.volume,
-        integer: defS.integer,
-        spaceID: defS.spaceID,
+        spaceDefID: spaceDef.spaceDefID,
+        space: space,
+        instance: spaceDef.instances,
+        x: spaceDef.x,
+        y: spaceDef.y,
+        z: spaceDef.z,
+        volume: spaceDef.volume,
+        integer: spaceDef.integer,
     });
 };
 
 function generateModels() {
     // generate single instance of each spatial model defintion
     for (let i = 0; i < spaceDef.length; i++) {
-        generateModel(spaceDef[i].spaceID);
+        generateModel(spaceDef[i].spaceDefID);
     }
 };
 
-// Lower-Order Model Operations
+// Model Tests
+function checkVolume() {
+    // checks if total volume of objects is less than total volume of space
+    // accumulate sum volume for objects
+    let objectVol = 0;
+    for (let i = 0; i < objectQueue.length; i++) {
+        objectVol += objectQueue[i].volume;
+    }
+    // accumulate sum volume for spaces
+    let spaceVol = 0;
+    for (let i = 0; i < spaceDef.length; i++) {
+        spaceVol += spaceDef[i].volume;
+    }
+    // compare size of accumlated sums
+    if (objectVol < spaceVol) {
+        return true; // fits
+    } else {
+        return false; // insufficient space for objects
+    }
+};
+
+// Lower-Order Model Operations 
 function validCoor(model, x, y, z) {
-    // tests for whether the coordinate exists in the space at spaceID
-    const defS = model;
-    if (defS.integer === true) {
+    // tests for whether the coordinate exists in the space at spaceDefID
+    if (model.integer === true) {
         // integer space
-        if (x >= -(Math.ceil(defS.x / 2)) + 1 && x < Math.floor(defS.x / 2) + 1 && y >= -(Math.ceil(defS.y / 2)) + 1 && y < Math.floor(defS.y / 2) + 1 && z >= -(Math.ceil(defS.z / 2)) + 1 && z < Math.floor(defS.z / 2) + 1) {
+        if (x >= -(Math.ceil(model.x / 2)) + 1 && x < Math.floor(model.x / 2) + 1 && y >= -(Math.ceil(model.y / 2)) + 1 && y < Math.floor(model.y / 2) + 1 && z >= -(Math.ceil(model.z / 2)) + 1 && z < Math.floor(model.z / 2) + 1) {
             // if each coordinate value satasfies the range for that dimension in the model
             return true;
         } else {
-            console.log(`No such coordinate in ${defS.name}!`);
+            console.log(`No {${x}, ${y}, ${z}} coordinate in ${model.name}!`);
             return false;
         }
     } else {
         // positive space
-        if (x >= 0 && x < defS.x && y >= 0 && y < defS.y && z >= 0 && z < defS.z) {
+        if (x >= 0 && x < model.x && y >= 0 && y < model.y && z >= 0 && z < model.z) {
             // if each coordinate value satasfies the range for that dimension in the model
             return true;
         } else {
-            console.log(`No such coordinate in ${defS.name}!`);
+            console.log(`No {${x}, ${y}, ${z}} coordinate in ${model.name}!`);
             return false;
         }
     }
@@ -378,7 +429,57 @@ function getPointIndex(modelIndex, x, y, z) {
     }
 };
 
-// Single Point Access
+function validateSpace(model, min, max) {
+    const xRange = max[0] - min[0];
+    const yRange = max[1] - min[1];
+    const zRange = max[2] - min[2];
+
+    let xStart, xEnd, yStart, yEnd, zStart, zEnd;
+
+    if (xRange === 0) { // for no difference 
+        xRange = 1;
+    } else if (xRange > 0) { // for positive difference 
+        xStart = min[0];
+        xEnd = max[0];
+    } else { // for negative difference 
+        xStart = max[0];
+        xEnd = min[0];
+    }
+
+    if (yRange === 0) { // for no change 
+        yRange = 1;
+    } else if (yRange > 0) { // for positive difference 
+        yStart = min[1];
+        yEnd = max[1];
+    } else { // for negative difference 
+        yStart = max[1];
+        yEnd = min[1];
+    }
+
+    if (zRange === 0) { // for no change 
+        zRange = 1;
+    } else if (zRange > 0) { // for positive difference 
+        zStart = min[2];
+        zEnd = max[2];
+    } else { // for negative difference 
+        zStart = max[2];
+        zEnd = min[2];
+    }
+
+    for (let x = xStart; x < xEnd; x++) {
+        for (let y = yStart; y < yEnd; y++) {
+            for (let z = zStart; z< zEnd; z++) {
+                if (!validCoor(model, x, y, z)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return {start: [xStart, yStart, zStart], end: [xEnd, yEnd, zEnd]};
+};
+
+// Single Point Access 
 function spa(modelIndex, x, y, z) {
     // returns a single point object
     const pointIndex = getPointIndex(modelIndex, x, y, z);
@@ -389,9 +490,9 @@ function spa(modelIndex, x, y, z) {
     }
 };
 
-// Full Model Scanning
-function fullScan(space, test, id) {
-    // scans every point in a model's space to return a part
+// Full Model Scanning 
+function getScanFull(space, test, id) {
+    // gets a portion of a space by testing the properties of all points
     let result = [];
     for (let i = 0; i < space.length; i++) {
         const point = space[i];
@@ -402,134 +503,73 @@ function fullScan(space, test, id) {
     return result;
 };
 
-// Focus Scan
-function focusScan(modelIndex, test, xi, xf, yi, yf, zi, zf, id) {
-    // uses single point access to test all points in a specified region of a space
-    let xRange = xf - xi;
-    if (xRange === 0) { // for no change
-        // prevent multiplication by zero
-        xRange = 1; 
-    }
-    let yRange = yf - yi;
-    if (yRange === 0) { // for no change
-        // prevent multiplication by zero
-        yRange = 1;
-    }
-    let zRange = zf - zi;
-    if (zRange === 0) { // for no change
-        // prevent multiplication by zero
-        zRange = 1;
-    }
-    const volume = Math.abs(xRange * yRange * zRange);
-    if (volume < 1000) { // no more than 1000 points per focusScan
-        // determine starting value for incrimental interation
-        let xStart, xEnd, yStart, yEnd, zStart, zEnd;
-        if (xRange === 1) { // no range?
-            xStart = xi;
-            xEnd = xi + 1; //  make 1
-        } else if (xRange > 0) { // positive diff
-            xStart = xi; // start with initial
-            xEnd = xf;
-        } else { // negative diff
-            xStart = xf; // start with final
-            xEnd = xi;
+function fullScan(space, test, id) {
+    // scans every point in a model's space for a point property
+    for (let i = 0; i < space.length; i++) {
+        const point = space[i];
+        if (test(point, id)) {
+            return true;
         }
-        if (yRange === 1) { // no range?
-            yStart = yi;
-            yEnd = yi + 1; //  make 1
-        } else if (yRange > 0) { // positive diff
-            yStart = yi; // start with initial
-            yEnd = yf;
-        } else { // negative diff
-            yStart = yf; // start with final
-            yEnd = yi;
-        }
-        if (zRange === 1) { // no range? make 1
-            zStart = zi; 
-            zEnd = zi + 1; //  make 1
-        } else if (zRange > 0) { // positive diff
-            zStart = zi; // start with initial
-            zEnd = zf;
-        } else { // negative diff
-            zStart = zf; // start with final
-            zEnd = zi;
-        }
-        // search within ranges with spa
-        for (let i = xStart; i < xEnd; i++) {
-            for (let j = yStart; j < yEnd; j++) {
-                for (let k = zStart; k < zEnd; k++) {
-                    // spa will validate point + assign the point if valid or false if invalid
-                    const point = spa(modelIndex, i, j, k);
+    }
+    return false;
+};
+
+// Partial Model Scanning 
+function getScanFocus(modelIndex, minCoor, maxCoor, test, id) {
+    // uses single point access to test if any point in a specified region bear a specific point property
+    // validate space
+    const validSpace = validateSpace(models[modelIndex], minCoor, maxCoor);
+    if (validSpace !== false) {
+        // search within ranges with spa 
+        let result = [];
+        for (let x = validSpace.start[0]; x < validSpace.end[0]; x++) {
+            for (let y = validSpace.start[1]; y < validSpace.end[1]; y++) {
+                for (let z = validSpace.start[2]; z < validSpace.end[2]; z++) {
+                    // use single point access to test each point 
+                    const point = spa(modelIndex, x, y, z);
                     if (point !== false && test(point, id)) {
-                        return true;
+                        result.push(point);
                     }
                 }
             }
         }
-        return false;
+        return result;
     } else {
-        console.log(`Error: focusScan can only scan under 1000 points at a time. Attempted ${Math.abs(volume - 1000)} points more than permitted.`);
         return false;
     }
 };
 
-// tests
-function sector1(point) {
-    if (point.sector === 1) {
+function focusScan(modelIndex, minCoor, maxCoor, test, id) {
+    // uses single point access to test if any point in a specified region bear a specific point property
+        // validate space
+        const validSpace = validateSpace(models[modelIndex], minCoor, maxCoor);
+        if (validSpace !== false) {
+            // search within ranges with spa 
+            for (let x = validSpace.start[0]; x < validSpace.end[0]; x++) {
+                for (let y = validSpace.start[1]; y < validSpace.end[1]; y++) {
+                    for (let z = validSpace.start[2]; z < validSpace.end[2]; z++) {
+                        // use single point access to test each point 
+                        const point = spa(modelIndex, x, y, z);
+                        if (point !== false && test(point, id)) {
+                            return true; // return true on any pass
+                        }
+                    }
+                }
+            }
+        } else {
+            return false;
+        }
+};
+    
+// tests for scanning
+function sector(point, number) {
+    if (point.sector === number) {
         return true;
     } else {
         return false;
     }
 };
-function sector2(point) {
-    if (point.sector === 2) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector3(point) {
-    if (point.sector === 3) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector4(point) {
-    if (point.sector === 4) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector5(point) {
-    if (point.sector === 5) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector6(point) {
-    if (point.sector === 6) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector7(point) {
-    if (point.sector === 7) {
-        return true;
-    } else {
-        return false;
-    }
-};
-function sector8(point) {
-    if (point.sector === 8) {
-        return true;
-    } else {
-        return false;
-    }
-};
+
 function identifyObject(point, objectID) {
     if (point.objectID === objectID) {
         return true;
@@ -537,15 +577,31 @@ function identifyObject(point, objectID) {
         return false;
     }
 };
-function open(point) {
-    if (point.open === true) {
-        return true;
+
+function identifyObjectDef(point, objectDefID) {
+    if (point.objectID.length > 0) {
+        const id = point.objectID;
+        let compile = "";
+        for (let i = 0; i < id.length; i++) {
+            const char = id.slice(i, i + 1);
+            if (char !== "-") {
+                compile += char;
+            } else {
+                break;
+            }
+        }
+        if (compile === objectDefID) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
 };
-function unopen(point) {
-    if (point.open === false) {
+
+function openPoint(point, open) {
+    if (point.open === open) {
         return true;
     } else {
         return false;
@@ -553,51 +609,48 @@ function unopen(point) {
 };
 
 // Higher-Order Model Operations
+function addObject(model, object, x, y, z) {
+    // add object to model start at x, y, z
+    if (validCoor(model, x, y, z) && validCoor(model, Number(object.x) + x, Number(object.y) + y, Number(object.z) + z)) {
+        const index = getModelIndex(model.modelID);
+        for (let i = 0; i < object.coors.length; i++) {
+            const c = object.coors[i];
+            spa(index, c[0] + x, c[1] + y, c[2] + z).open = false;
+            spa(index, c[0] + x, c[1] + y, c[2] + z).objectID = object.objectID;
+        }
+    }
+};
 
-// function transpose(objectID, modelID, x, y, z) {
-//     // tranpose what in where from where to where
-//     if (validCoor(models[getModelIndex(modelID)], x, y, z)) {
-        
-//     }
-// };
+function transpose(objectID, model, x, y, z) {
+    // tranpose object in model from where it is found to x, y, z
+    if (validCoor(model, x, y, z)) {
+
+    }
+};
 
 /////////////////// PROCESS ///////////////////
 
-defineSpaces();
-console.log(spaceDef);
+defineSpaces(); 
+console.log(spaceDef); 
 
-defineObjects();
-console.log(objectDef);
+defineObjects(); 
+console.log(objectDef); 
 
-generateModel(spaceDef[0].spaceID);
-console.log(models);
+generateModel(spaceDef[0]); 
+console.log(models); 
 
-spa(0, 0, 2, 1).open = false;
-spa(0, 0, 3, 1).open = false;
-spa(0, 0, 4, 1).open = false;
-spa(0, 0, 4, 2).open = false;
+generateObject(objectDef[0]); 
+console.log(objectQueue); 
 
-console.log(fullScan(models[0].space, unopen));
-console.log(focusScan(0, unopen, 0, 0, 2, 4, 1, 2));
+addObject(models[0], objectQueue[0], 1, 2, 1); 
 
-// console.log(fullScan(models[0].space, sector1));
-// console.log(fullScan(models[0].space, sector2));
-// console.log(fullScan(models[0].space, sector3));
-// console.log(fullScan(models[0].space, sector4));
-// console.log(fullScan(models[0].space, sector5));
-// console.log(fullScan(models[0].space, sector6));
-// console.log(fullScan(models[0].space, sector7));
-// console.log(fullScan(models[0].space, sector8));
+console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID)); 
 
-// console.log(fullScan(models[0].space, identifyObject, objectDef[0].objectID));
-// console.log(fullScan(models[0].space, sector1).concat(fullScan(models[0].space, sector2)));
-// console.log(fullScan(fullScan(models[0].space, identifyObject, objectDef[0].objectID), sector1));
-// console.log(fullScan(fullScan(models[0].space, sector1).concat(fullScan(models[0].space, sector2)), identifyObject, objectDef[0].objectID));
 
-/////////////////// DISPLAY ///////////////////
-// form component functions
+/////////////////// DISPLAY /////////////////// 
+// form component functions 
 function removeBTNComponent(text, addClass='') {
-    // create
+    // create 
     const removeBTNcontainer = document.createElement('div');
     removeBTNcontainer.setAttribute('class', 'center-flex');
 
@@ -607,10 +660,10 @@ function removeBTNComponent(text, addClass='') {
     removeBTN.innerText = `${text}`;
     removeBTN.addEventListener("click", (e) => {e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode)});
 
-    // assemble
+    // assemble 
     removeBTNcontainer.appendChild(removeBTN);
     
-    // return
+    // return 
     return removeBTNcontainer;
 };
 
@@ -619,7 +672,7 @@ function addBreak() {
 };
 
 function titleComponent(text) {
-    // title component
+    // title component 
     const title = document.createElement('div');
     title.setAttribute('class', 'center-flex');
 
@@ -637,7 +690,7 @@ function titleComponent(text) {
 
 function dimensionsComponent(type) {
     if (type === "space") {
-        // Dimensions component for space forms
+        // Dimensions component for space forms 
         const dimensions = document.createElement('div');
         dimensions.setAttribute('class', 'form-layout-block');
         
@@ -689,7 +742,7 @@ function dimensionsComponent(type) {
         z.setAttribute('placeholder', 'points of Z dimension');
         z.setAttribute('required', true);
     
-        // assemble dimensions component
+        // assemble dimensions component 
         dimensions.appendChild(labelName);
         dimensions.appendChild(name);
         dimensions.appendChild(labelX);
@@ -702,7 +755,7 @@ function dimensionsComponent(type) {
         return dimensions;
 
     } else if (type === "object") {
-        // Dimensions component for object forms
+        // Dimensions component for object forms 
         const dimensions = document.createElement('div');
         dimensions.setAttribute('class', 'form-layout-block');
         
@@ -753,7 +806,7 @@ function dimensionsComponent(type) {
         z.setAttribute('placeholder', 'points of Z dimension');
         z.setAttribute('required', true);
     
-        // assemble dimensions component
+        // assemble dimensions component 
         dimensions.appendChild(labelName);
         dimensions.appendChild(name);
         dimensions.appendChild(labelX);
@@ -767,14 +820,14 @@ function dimensionsComponent(type) {
     }
 };
 
-// form functions
+// form functions 
 function addObstructForm(e) {
-    // build a new obstruction
+    // build a new obstruction 
     const obstruct = document.createElement('div');
     obstruct.setAttribute('class', 'obstruction form-layout-block outline');
     obstruct.setAttribute('id', `obstruct-${generateID(obstructFormIDstructure)}`);
     
-    // create components
+    // create components 
     const labelX = document.createElement('label');
     labelX.setAttribute('for', 'Xdimension');
     labelX.innerText = "X dimension";
@@ -811,7 +864,7 @@ function addObstructForm(e) {
     z.setAttribute('placeholder', "Quantity of Z dimension");
     z.setAttribute('required', true);
     
-    // assemble components
+    // assemble components 
     obstruct.appendChild(labelX);
     obstruct.appendChild(x);
     obstruct.appendChild(labelY);
@@ -820,21 +873,21 @@ function addObstructForm(e) {
     obstruct.appendChild(z);
     obstruct.appendChild(removeBTNComponent('remove', 'removeBTN-layout'));
 
-    // append built obstruction to the space form containing the selected button
+    // append built obstruction to the space form containing the selected button 
     e.target.parentNode.parentNode.querySelector('.obstructions').appendChild(obstruct);
 };
 
 function addSpaceForm() {
-    // build new space form
+    // build new space form 
     generateID(spaceFormIDstructure);
     const formID = getID(spaceFormIDstructure);
     const form = document.createElement('div');
     form.setAttribute('class', 'space-form content-highlight2');
     form.setAttribute('id', `space-form-${formID}`);
 
-    // create components
+    // create components 
 
-    // integer component
+    // integer component 
     const integer = document.createElement('fieldset');
     integer.setAttribute('class', 'center-flex');
 
@@ -861,14 +914,14 @@ function addSpaceForm() {
     optionPos.setAttribute('value', 'false');
     optionPos.setAttribute('required', true);
 
-    // integer component assemble
+    // integer component assemble 
     integer.appendChild(integerLegend);
     integer.appendChild(labelInt);
     integer.appendChild(optionInt);
     integer.appendChild(optionPos);
     integer.appendChild(labelPos);
     
-    // sector component
+    // sector component 
     const sector = document.createElement('fieldset');
     sector.setAttribute('class', 'center-flex');
 
@@ -898,7 +951,7 @@ function addSpaceForm() {
     option5.setAttribute('value', '8');
     option5.innerText = '(8) Octant';
 
-    // assemble sector component
+    // assemble sector component 
     sector.appendChild(sectorLegend);
     select.appendChild(option1);
     select.appendChild(option2);
@@ -907,11 +960,11 @@ function addSpaceForm() {
     select.appendChild(option5);
     sector.appendChild(select);
 
-    // Obstructions component
+    // Obstructions component 
     const obstructions = document.createElement('div');
     obstructions.setAttribute('class', 'obstructions form-layout-block-spaced center-flex');
 
-    // addObstruct button component
+    // addObstruct button component 
     const ObstructBTNcontainer = document.createElement('div');
     ObstructBTNcontainer.setAttribute('class', 'center-flex');
 
@@ -921,10 +974,10 @@ function addSpaceForm() {
     obstructBTN.innerText = 'add obstruction';
     obstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
 
-    // assemble addObstruct button component
+    // assemble addObstruct button component 
     ObstructBTNcontainer.appendChild(obstructBTN);
 
-    // assemble components into form
+    // assemble components into form 
     form.appendChild(titleComponent(`Space ${formID}`));
     form.appendChild(addBreak());
     form.appendChild(dimensionsComponent("space"));
@@ -941,20 +994,20 @@ function addSpaceForm() {
     form.appendChild(addBreak());
     form.appendChild(removeBTNComponent('delete space'));
 
-    // append to space form container
+    // append to space form container 
     spaceFormContainer.appendChild(form);
 };
 
 function addObjectForm() {
-    // build new object form
+    // build new object form 
     generateID(objectFormIDstructure);
     
     const form = document.createElement('div');
     form.setAttribute('class', 'object-form content-highlight2');
     form.setAttribute('id', `object-form-${getID(objectFormIDstructure)}`);
 
-    // create components
-    // quantity component
+    // create components 
+    // quantity component 
     const quantity = document.createElement('div');
     quantity.setAttribute('class', 'form-layout-block');
 
@@ -969,11 +1022,11 @@ function addObjectForm() {
     inputQuant.setAttribute('placeholder', 'Quantity of object');
     inputQuant.setAttribute('required', true);
 
-    // assemble quanitity component
+    // assemble quanitity component 
     quantity.appendChild(labelQuant);
     quantity.appendChild(inputQuant);
 
-    // assemble components
+    // assemble components 
     form.appendChild(titleComponent(`Object ${getID(objectFormIDstructure)}`));
     form.appendChild(addBreak());
     form.appendChild(dimensionsComponent("object"));
@@ -981,16 +1034,16 @@ function addObjectForm() {
     form.appendChild(addBreak());
     form.appendChild(removeBTNComponent('delete object'));
 
-    // append to object form container
+    // append to object form container 
     objectFormContainer.appendChild(form);
 };
 
-// Slider Logic
+// Slider Logic 
 function sliderInitPercent(sliderID, outputID) {
-    // select from Document Object Model
+    // select from Document Object Model 
     const slider = document.body.querySelector("#"+ sliderID);
     const output = document.body.querySelector("#"+ outputID);
-    // display initial value
+    // display initial value 
     const sliderVal = slider.value;
     if (sliderVal.length === 3) {
         output.textContent = `${sliderVal}%`;
@@ -999,7 +1052,7 @@ function sliderInitPercent(sliderID, outputID) {
     } else {
         output.textContent = `00${sliderVal}%`;
     }
-    // update on change
+    // update on change 
     slider.addEventListener('input', () => {
         const sliderVal = slider.value;
         if (sliderVal.length === 3) {
@@ -1010,7 +1063,7 @@ function sliderInitPercent(sliderID, outputID) {
             output.textContent = `00${sliderVal}%`;
         }
     });
-    // center slider on double click
+    // center slider on double click 
     slider.addEventListener('dblclick', () => {
         slider.value = 50;
         output.textContent = `0${slider.value}%`;
@@ -1019,20 +1072,20 @@ function sliderInitPercent(sliderID, outputID) {
 
 function sliderInitRatio(sliderID, outputID) {
     const divisor = 50;
-    // select from Document Object Model
+    // select from Document Object Model 
     const slider = document.body.querySelector("#"+ sliderID);
     const output = document.body.querySelector("#"+ outputID);
-    // display initial value
+    // display initial value 
     const sliderVal = slider.value;
     const y = parseFloat(sliderVal / divisor).toFixed(2);
     output.textContent = `${y}`;
-    // update on change
+    // update on change 
     slider.addEventListener('input', () => {
         const sliderVal = slider.value;
         const y = parseFloat(sliderVal / divisor).toFixed(2);
         output.textContent = `${y}`;
     });
-    // center slider on double click
+    // center slider on double click 
     slider.addEventListener('dblclick', () => {
         slider.value = divisor;
         const sliderVal = slider.value;
@@ -1044,7 +1097,7 @@ function sliderInitRatio(sliderID, outputID) {
 sliderInitPercent("graph-resolution", "graph-resolution-val");
 sliderInitRatio("playback-multiplier", "playback-multiplier-val");
 
-// attach listeners to onload buttons
+// attach listeners to onload buttons 
 addObstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
 addSpaceBTN.addEventListener('click', addSpaceForm);
 addObjectBTN.addEventListener('click', addObjectForm);
