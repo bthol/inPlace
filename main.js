@@ -355,6 +355,56 @@ function validCoor(model, x, y, z) {
     }
 };
 
+function validateSpace(model, min, max) {
+    const xRange = max[0] - min[0];
+    const yRange = max[1] - min[1];
+    const zRange = max[2] - min[2];
+
+    let xStart, xEnd, yStart, yEnd, zStart, zEnd;
+
+    if (xRange === 0) { // for no difference 
+        xRange = 1;
+    } else if (xRange > 0) { // for positive difference 
+        xStart = min[0];
+        xEnd = max[0];
+    } else { // for negative difference 
+        xStart = max[0];
+        xEnd = min[0];
+    }
+
+    if (yRange === 0) { // for no change 
+        yRange = 1;
+    } else if (yRange > 0) { // for positive difference 
+        yStart = min[1];
+        yEnd = max[1];
+    } else { // for negative difference 
+        yStart = max[1];
+        yEnd = min[1];
+    }
+
+    if (zRange === 0) { // for no change 
+        zRange = 1;
+    } else if (zRange > 0) { // for positive difference 
+        zStart = min[2];
+        zEnd = max[2];
+    } else { // for negative difference 
+        zStart = max[2];
+        zEnd = min[2];
+    }
+
+    for (let x = xStart; x < xEnd; x++) {
+        for (let y = yStart; y < yEnd; y++) {
+            for (let z = zStart; z< zEnd; z++) {
+                if (!validCoor(model, x, y, z)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true && {start: [xStart, yStart, zStart], end: [xEnd, yEnd, zEnd]};
+};
+
 function getPointIndex(modelIndex, x, y, z) {
     if (validCoor(models[modelIndex], x, y, z)) {
         // get space definition
@@ -429,54 +479,18 @@ function getPointIndex(modelIndex, x, y, z) {
     }
 };
 
-function validateSpace(model, min, max) {
-    const xRange = max[0] - min[0];
-    const yRange = max[1] - min[1];
-    const zRange = max[2] - min[2];
-
-    let xStart, xEnd, yStart, yEnd, zStart, zEnd;
-
-    if (xRange === 0) { // for no difference 
-        xRange = 1;
-    } else if (xRange > 0) { // for positive difference 
-        xStart = min[0];
-        xEnd = max[0];
-    } else { // for negative difference 
-        xStart = max[0];
-        xEnd = min[0];
-    }
-
-    if (yRange === 0) { // for no change 
-        yRange = 1;
-    } else if (yRange > 0) { // for positive difference 
-        yStart = min[1];
-        yEnd = max[1];
-    } else { // for negative difference 
-        yStart = max[1];
-        yEnd = min[1];
-    }
-
-    if (zRange === 0) { // for no change 
-        zRange = 1;
-    } else if (zRange > 0) { // for positive difference 
-        zStart = min[2];
-        zEnd = max[2];
-    } else { // for negative difference 
-        zStart = max[2];
-        zEnd = min[2];
-    }
-
-    for (let x = xStart; x < xEnd; x++) {
-        for (let y = yStart; y < yEnd; y++) {
-            for (let z = zStart; z< zEnd; z++) {
-                if (!validCoor(model, x, y, z)) {
-                    return false;
-                }
-            }
+function getObjectDef(object) {
+    const objectID = object.objectID;
+    let ID = "";
+    for (let i = 0; i < objectID.length; i++) {
+        const char = objectID.slice(i, i + 1);
+        if (char !== "-") {
+            ID += char;
+        } else {
+            break;
         }
     }
-
-    return {start: [xStart, yStart, zStart], end: [xEnd, yEnd, zEnd]};
+    return objectDef[getObjectDefIndex(ID)];
 };
 
 // Single Point Access 
@@ -611,7 +625,7 @@ function openPoint(point, open) {
 // Higher-Order Model Operations
 function addObject(model, object, x, y, z) {
     // add object to model start at x, y, z
-    if (validCoor(model, x, y, z) && validCoor(model, Number(object.x) + x, Number(object.y) + y, Number(object.z) + z)) {
+    if (validateSpace(model, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
         const index = getModelIndex(model.modelID);
         for (let i = 0; i < object.coors.length; i++) {
             const c = object.coors[i];
@@ -621,30 +635,30 @@ function addObject(model, object, x, y, z) {
     }
 };
 
-function transpose(objectID, model, x, y, z) {
+function transpose(object, model, x, y, z) {
     // tranpose object in model from where it is found to x, y, z
-    if (validCoor(model, x, y, z)) {
+    if (validateSpace(model, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
 
     }
 };
 
 /////////////////// PROCESS ///////////////////
 
-defineSpaces(); 
-console.log(spaceDef); 
+defineSpaces();
+console.log(spaceDef);
 
-defineObjects(); 
-console.log(objectDef); 
+defineObjects();
+console.log(objectDef);
 
-generateModel(spaceDef[0]); 
-console.log(models); 
+generateModel(spaceDef[0]);
+console.log(models);
 
-generateObject(objectDef[0]); 
-console.log(objectQueue); 
+generateObject(objectDef[0]);
+console.log(objectQueue);
 
-addObject(models[0], objectQueue[0], 1, 2, 1); 
+addObject(models[0], objectQueue[objectQueue.length - 1], 1, 2, 1);
 
-console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID)); 
+console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID));
 
 
 /////////////////// DISPLAY /////////////////// 
