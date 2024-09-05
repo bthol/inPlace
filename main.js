@@ -510,10 +510,10 @@ function spa(modelIndex, x, y, z) {
 // Full Model Scanning 
 function getScanFull(modelIndex, test, id) {
     // gets a portion of a space by testing the properties of all points
-    const model = models[modelIndex];
+    const space = models[modelIndex].space;
     let result = [];
-    for (let i = 0; i < model.length; i++) {
-        const point = model[i];
+    for (let i = 0; i < space.length; i++) {
+        const point = space[i];
         if (test(point, id)) {
             result.push(point);
         }
@@ -523,9 +523,9 @@ function getScanFull(modelIndex, test, id) {
 
 function fullScan(modelIndex, test, id) {
     // scans every point in a model's space for a point property
-    const model = models[modelIndex];
-    for (let i = 0; i < model.length; i++) {
-        const point = model[i];
+    const space = models[modelIndex].space;
+    for (let i = 0; i < space.length; i++) {
+        const point = space[i];
         if (test(point, id)) {
             return true;
         }
@@ -641,7 +641,8 @@ function addObject(modelIndex, object, x, y, z) {
 
 function transpose(modelIndex, objectID, x, y, z) {
     // tranpose object in model from where it is found to x, y, z
-    if (validateSpace(models[modelIndex], [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
+    const object = objectDef[getObjectDefIndex(objectID)];
+    if (validateSpace(modelIndex, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
 
     }
 };
@@ -663,6 +664,7 @@ console.log(objectQueue);
 addObject(0, objectQueue[objectQueue.length - 1], 1, 2, 1);
 
 // console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID));
+console.log(getScanFull(0, identifyObject, "a-a"));
 console.log(spa(0, 1, 2, 1));
 
 
