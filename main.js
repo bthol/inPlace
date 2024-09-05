@@ -220,14 +220,15 @@ function defineObjects() {
 };
 
 // Object Generation
-function generateObject(objectDef) {
+function generateObject(objectDefIndex) {
     // generate object and store in queue structure
+    const OD = objectDef[objectDefIndex];
     let object = {
-        objectID: `${objectDef.objectDefID}-${generateID(objectIDstructure)}`,
-        x: objectDef.x,
-        y: objectDef.y,
-        z: objectDef.z,
-        volume: objectDef.volume,
+        objectID: `${OD.objectDefID}-${generateID(objectIDstructure)}`,
+        x: OD.x,
+        y: OD.y,
+        z: OD.z,
+        volume: OD.volume,
     };
     let coordinates = [];
     for (let x = 0; x < object.x; x++) {
@@ -243,20 +244,21 @@ function generateObject(objectDef) {
 
 function generateObjects() {
     // generate single instance of each object defintion
-    for (let i = 0; i < objectDef.length; i++) {
-        generateModel(objectDef[i].obnjectDefID);
+    for (let i = 0; i < OD.length; i++) {
+        generateModel(i);
     }
 };
 
 // Model Generation
-function generateModel(spaceDef) {
+function generateModel(spaceDefIndex) {
+    const SD = spaceDef[spaceDefIndex];
     // generate coordinates with correct number type 
     let space = [];
-    if (spaceDef.integer === true) {
+    if (SD.integer === true) {
         // integer coordinate field 
-        for (let x = -(Math.ceil(spaceDef.x / 2)) + 1; x < Math.floor(spaceDef.x / 2) + 1; x++) {
-            for (let y = -(Math.ceil(spaceDef.y / 2)) + 1; y < Math.floor(spaceDef.y / 2) + 1; y++) {
-                for (let z = -(Math.ceil(spaceDef.z / 2)) + 1; z < Math.floor(spaceDef.z / 2) + 1; z++) {
+        for (let x = -(Math.ceil(SD.x / 2)) + 1; x < Math.floor(SD.x / 2) + 1; x++) {
+            for (let y = -(Math.ceil(SD.y / 2)) + 1; y < Math.floor(SD.y / 2) + 1; y++) {
+                for (let z = -(Math.ceil(SD.z / 2)) + 1; z < Math.floor(SD.z / 2) + 1; z++) {
                     // each coordinate point 
                     space.push({coor: [x, y, z], objectID: "", open: true});
                 }
@@ -264,9 +266,9 @@ function generateModel(spaceDef) {
         }
     } else {
         // positive coordinate field 
-        for (let x = 0; x < spaceDef.x; x++) {
-            for (let y = 0; y < spaceDef.y; y++) {
-                for (let z = 0; z < spaceDef.z; z++) {
+        for (let x = 0; x < SD.x; x++) {
+            for (let y = 0; y < SD.y; y++) {
+                for (let z = 0; z < SD.z; z++) {
                     space.push({coor: [x, y, z], objectID: "", open: true});
                 }
             }
@@ -277,9 +279,9 @@ function generateModel(spaceDef) {
         space[i].spaceIndex = i;
     }
     // add sector data to points 
-    if (spaceDef.sectors > 1) {
-        const sections = spaceDef.sectors;
-        const sectionVolume = Math.floor(spaceDef.volume / sections);
+    if (SD.sectors > 1) {
+        const sections = SD.sectors;
+        const sectionVolume = Math.floor(SD.volume / sections);
         let sect = 0;
         for (let i = 0; i < space.length; i++) {
             if (i / sectionVolume % 1 === 0 && i / sectionVolume !== sections) {
@@ -289,24 +291,24 @@ function generateModel(spaceDef) {
         }
     }
     // add model to models structure
-    spaceDef.instances += 1;
+    SD.instances += 1;
     models.push({
         modelID: generateID(modelIDstructure),
-        spaceDefID: spaceDef.spaceDefID,
+        spaceDefID: SD.spaceDefID,
         space: space,
-        instance: spaceDef.instances,
-        x: spaceDef.x,
-        y: spaceDef.y,
-        z: spaceDef.z,
-        volume: spaceDef.volume,
-        integer: spaceDef.integer,
+        instance: SD.instances,
+        x: SD.x,
+        y: SD.y,
+        z: SD.z,
+        volume: SD.volume,
+        integer: SD.integer,
     });
 };
 
 function generateModels() {
     // generate single instance of each spatial model defintion
     for (let i = 0; i < spaceDef.length; i++) {
-        generateModel(spaceDef[i].spaceDefID);
+        generateModel(i);
     }
 };
 
@@ -332,8 +334,9 @@ function checkVolume() {
 };
 
 // Lower-Order Model Operations 
-function validCoor(model, x, y, z) {
+function validCoor(modelIndex, x, y, z) {
     // tests for whether the coordinate exists in the space at spaceDefID
+    const model = models[modelIndex];
     if (model.integer === true) {
         // integer space
         if (x >= -(Math.ceil(model.x / 2)) + 1 && x < Math.floor(model.x / 2) + 1 && y >= -(Math.ceil(model.y / 2)) + 1 && y < Math.floor(model.y / 2) + 1 && z >= -(Math.ceil(model.z / 2)) + 1 && z < Math.floor(model.z / 2) + 1) {
@@ -355,7 +358,7 @@ function validCoor(model, x, y, z) {
     }
 };
 
-function validateSpace(model, min, max) {
+function validateSpace(modelIndex, min, max) {
     const xRange = max[0] - min[0];
     const yRange = max[1] - min[1];
     const zRange = max[2] - min[2];
@@ -395,7 +398,7 @@ function validateSpace(model, min, max) {
     for (let x = xStart; x < xEnd; x++) {
         for (let y = yStart; y < yEnd; y++) {
             for (let z = zStart; z< zEnd; z++) {
-                if (!validCoor(model, x, y, z)) {
+                if (!validCoor(modelIndex, x, y, z)) {
                     return false;
                 }
             }
@@ -406,7 +409,7 @@ function validateSpace(model, min, max) {
 };
 
 function getPointIndex(modelIndex, x, y, z) {
-    if (validCoor(models[modelIndex], x, y, z)) {
+    if (validCoor(modelIndex, x, y, z)) {
         // get space definition
         const defS = models[modelIndex];
 
@@ -479,8 +482,8 @@ function getPointIndex(modelIndex, x, y, z) {
     }
 };
 
-function getObjectDef(object) {
-    const objectID = object.objectID;
+function getObjectDef(objectID) {
+    // returns object definition associated with objectID
     let ID = "";
     for (let i = 0; i < objectID.length; i++) {
         const char = objectID.slice(i, i + 1);
@@ -505,11 +508,12 @@ function spa(modelIndex, x, y, z) {
 };
 
 // Full Model Scanning 
-function getScanFull(space, test, id) {
+function getScanFull(modelIndex, test, id) {
     // gets a portion of a space by testing the properties of all points
+    const model = models[modelIndex];
     let result = [];
-    for (let i = 0; i < space.length; i++) {
-        const point = space[i];
+    for (let i = 0; i < model.length; i++) {
+        const point = model[i];
         if (test(point, id)) {
             result.push(point);
         }
@@ -517,10 +521,11 @@ function getScanFull(space, test, id) {
     return result;
 };
 
-function fullScan(space, test, id) {
+function fullScan(modelIndex, test, id) {
     // scans every point in a model's space for a point property
-    for (let i = 0; i < space.length; i++) {
-        const point = space[i];
+    const model = models[modelIndex];
+    for (let i = 0; i < model.length; i++) {
+        const point = model[i];
         if (test(point, id)) {
             return true;
         }
@@ -623,21 +628,20 @@ function openPoint(point, open) {
 };
 
 // Higher-Order Model Operations
-function addObject(model, object, x, y, z) {
-    // add object to model start at x, y, z
-    if (validateSpace(model, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
-        const index = getModelIndex(model.modelID);
+function addObject(modelIndex, object, x, y, z) {
+    // adds last object in objectQueue to model starting at x, y, z
+    if (validateSpace(modelIndex, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
         for (let i = 0; i < object.coors.length; i++) {
             const c = object.coors[i];
-            spa(index, c[0] + x, c[1] + y, c[2] + z).open = false;
-            spa(index, c[0] + x, c[1] + y, c[2] + z).objectID = object.objectID;
+            spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).open = false;
+            spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).objectID = object.objectID;
         }
     }
 };
 
-function transpose(object, model, x, y, z) {
+function transpose(modelIndex, objectID, x, y, z) {
     // tranpose object in model from where it is found to x, y, z
-    if (validateSpace(model, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
+    if (validateSpace(models[modelIndex], [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
 
     }
 };
@@ -650,15 +654,16 @@ console.log(spaceDef);
 defineObjects();
 console.log(objectDef);
 
-generateModel(spaceDef[0]);
+generateModel(0);
 console.log(models);
 
-generateObject(objectDef[0]);
+generateObject(0);
 console.log(objectQueue);
 
-addObject(models[0], objectQueue[objectQueue.length - 1], 1, 2, 1);
+addObject(0, objectQueue[objectQueue.length - 1], 1, 2, 1);
 
-console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID));
+// console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID));
+console.log(spa(0, 1, 2, 1));
 
 
 /////////////////// DISPLAY /////////////////// 
