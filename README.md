@@ -1,8 +1,9 @@
-# sysmod
-Developer: Blake Thollaug
+# inPlace
+**Developer**: Blake Thollaug
 
-Description: Sysmod is tool for designing inventory systems that employs the simulation of storing, organizing, and retrieving in parametric inventory models. Visuals are corporate academic style.
+**Description**: inPlace is tool for designing inventory systems that employs the simulation of storing, organizing, and retrieving in parametric inventory models. Visuals are corporate academic style.
 
+## About
 Each spatial model is an organized list of objects, where each object represents a point in the space modelled.
 
 Their method of generation is three levels of nested iteration (cubic complexity; O(n^3)). This ineffeciency was unfortunately necessary to ensure every point in the spatial model was generated. However, the inefficiency occurs only during model generation, and will not affect operation on the model.
@@ -21,7 +22,7 @@ The number of objects in the spatial model is equal to the number of points in t
 
 The rates of change for a coordinate can be multiplied by their respective coordinates values to determine the minimum ammount into the list that the coordinate triple with that coordinate value must be. The minimum idexes for each coordinate value can be summed to produce the index in the list at which there exists that coordinate triple.
 
-id est:
+*id est*:
 x coordinate value * rate of change of x in list + y coordinate value * rate of change of y in list + z coordinate value * rate of change of z in list
 
 rate of change for z in list = 1
@@ -30,8 +31,8 @@ rate of change for x in list = y * z
 
 Therefore, the index in the list for the coordinate triple with given coordinate values = ( x coordinate * y * z ) + ( y coordinate * z ) + ( z coordinate ) = ( x minimum index ) + ( y minimum index ) + ( z minumum index )
 
-NOTE: This solution only works for positive/non-integer spatial models, because the coordinate value in desired coordinate triple are not equal to their index positions in the list.
-NOTE: This solution works at constant complexity ( O(n) ) making it the choice solution for object rendering in positive space for its maximal efficiency.
+**NOTE:** This solution only works for positive/non-integer spatial models, because the coordinate value in desired coordinate triple are not equal to their index positions in the list.
+**NOTE:** This solution works at constant complexity ( O(n) ) making it the choice solution for object rendering in positive space for its maximal efficiency.
 
 For integer spatial models, a different solution is needed.
 
