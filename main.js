@@ -244,8 +244,8 @@ function generateObject(objectDefIndex) {
 
 function generateObjects() {
     // generate single instance of each object defintion
-    for (let i = 0; i < OD.length; i++) {
-        generateModel(i);
+    for (let i = 0; i < objectDef.length; i++) {
+        generateObject(i);
     }
 };
 
@@ -496,6 +496,8 @@ function getObjectDef(objectID) {
     return objectDef[getObjectDefIndex(ID)];
 };
 
+// Higher-Order Model Operations
+
 // Single Point Access 
 function spa(modelIndex, x, y, z) {
     // returns a single point object
@@ -580,7 +582,7 @@ function focusScan(modelIndex, minCoor, maxCoor, test, id) {
         }
 };
     
-// tests for scanning
+// Tests for Scanning
 function sector(point, number) {
     if (point.sector === number) {
         return true;
@@ -627,15 +629,20 @@ function openPoint(point, open) {
     }
 };
 
-// Higher-Order Model Operations
-function addObject(modelIndex, object, x, y, z) {
+// Object Manipulation
+function addObject(modelIndex, x, y, z) {
     // adds last object in objectQueue to model starting at x, y, z
-    if (validateSpace(modelIndex, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
-        for (let i = 0; i < object.coors.length; i++) {
-            const c = object.coors[i];
-            spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).open = false;
-            spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).objectID = object.objectID;
+    if (objectQueue.length > 0) {
+        const object = objectQueue[objectQueue.length - 1];
+        if (validateSpace(modelIndex, [x, y, z], [Number(object.x) + x, Number(object.y) + y, Number(object.z) + z])) {
+            for (let i = 0; i < object.coors.length; i++) {
+                const c = object.coors[i];
+                spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).open = false;
+                spa(modelIndex, c[0] + x, c[1] + y, c[2] + z).objectID = object.objectID;
+            }
         }
+    } else {
+        console.log("No more objects in objectQueue!");
     }
 };
 
@@ -655,17 +662,15 @@ console.log(spaceDef);
 defineObjects();
 console.log(objectDef);
 
-generateModel(0);
+generateModels();
 console.log(models);
 
-generateObject(0);
+generateObjects();
 console.log(objectQueue);
 
-addObject(0, objectQueue[objectQueue.length - 1], 1, 2, 1);
+addObject(0, 1, 2, 1);
 
-// console.log(getScanFocus(0, [1, 0, 0], [5, 4, 8], identifyObjectDef, objectDef[0].objectDefID));
-console.log(getScanFull(0, identifyObject, "a-a"));
-console.log(spa(0, 1, 2, 1));
+console.log(getScanFull(0, identifyObjectDef, objectDef[0].objectDefID));
 
 
 /////////////////// DISPLAY /////////////////// 
