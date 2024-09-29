@@ -32,6 +32,7 @@ rate of change for x in list = y * z
 Therefore, the index in the list for the coordinate triple with given coordinate values = ( x coordinate * y * z ) + ( y coordinate * z ) + ( z coordinate ) = ( x minimum index ) + ( y minimum index ) + ( z minumum index )
 
 **NOTE:** This solution only works for positive/non-integer spatial models, because the coordinate value in desired coordinate triple are not equal to their index positions in the list.
+
 **NOTE:** This solution works at constant complexity ( O(n) ) making it the choice solution for object rendering in positive space for its maximal efficiency.
 
 For integer spatial models, a different solution is needed.
