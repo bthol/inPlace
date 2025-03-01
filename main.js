@@ -858,8 +858,83 @@ function dimensionsComponent(type) {
 };
 
 // form functions 
-function generate() {
+function modelParametersFormValid() {
+    // validates model-parameters form
+    // determines whether to preventDefault()
+    
+    // validate space forms
+    const spaceForms = document.body.querySelectorAll(".space-form");
+    for (let i = 0; i < spaceForms.length; i++) {
+        // each space form
+        const form = spaceForms[i];
+
+        // validate name field
+        if (form.querySelector(".name-space").value === "") {
+            return false;
+        }
+
+        // validate number type field
+        let isChecked = false;
+        form.querySelectorAll(".integer").forEach((option) => {
+            if (option.checked === true) {
+                isChecked = true;
+            }
+        });
+        if (!isChecked) {
+            // not checked
+            return false;
+        }
+
+        // validate dimension fields
+        const x = form.querySelectorAll(".Xdimension");
+        const y = form.querySelectorAll(".Ydimension");
+        const z = form.querySelectorAll(".Zdimension");
+        for (i in x) {
+            if (x[i].value === "") {
+                return false;
+            }
+        }
+        for (i in y) {
+            if (y[i].value === "") {
+                return false;
+            }
+        }
+        for (i in z) {
+            if (z[i].value === "") {
+                return false;
+            }
+        }
+    }
+
+    // validate object forms
+    const objectForms = document.body.querySelectorAll(".object-form");
+    for (let i = 0; i < objectForms.length; i++) {
+        // each object form
+        const form = objectForms[i];
+        console.log(form);
+        if (form.querySelector(".name-object").value === "") {
+            return false;
+        } else if (form.querySelector(".Xdimension").value === "") {
+            return false;
+        } else if (form.querySelector(".Ydimension").value === "") {
+            return false;
+        } else if (form.querySelector(".Zdimension").value === "") {
+            return false;
+        } else if (form.querySelector(".quantity").value === "") {
+            return false;
+        }
+    }
+    return true;
+};
+
+function generate(e) {
     // generates models from forms
+
+    // only prevent default if valid
+    // to use default form validation
+    if (modelParametersFormValid()) {
+        e.preventDefault();
+    }
 
     // initialize data structures
     spaceDef = [];
@@ -1209,7 +1284,7 @@ sliderInitPercent("graph-resolution", "graph-resolution-val");
 sliderInitRatio("playback-multiplier", "playback-multiplier-val");
 
 // attach listeners to onload buttons 
-formModel.generate.addEventListener("click", generate);
+formModel.generate.addEventListener("click", (e) => {generate(e)});
 formModel.initialize.addEventListener("click", initialize);
 addObstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
 addSpaceBTN.addEventListener('click', addSpaceForm);
