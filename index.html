@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sysmod</title>
+    <title>Objective Space</title>
     <script defer src="./main.js"></script>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <h1 id="title">Sysmod</h1>
+  <h1 id="title">Objective Space</h1>
   <div id="visualizer-container">
     <div id="visualizer-content"></div>
   </div>
@@ -117,8 +117,8 @@
 
                 <div class="form-layout-block">
 
-                  <label for="name-object">Name</label>
-                  <input name="name-object" class="name-object" type="text" min="1" max="10" placeholder="Name of object" required="true">
+                  <label for="nameObject">Name</label>
+                  <input name="nameObject" class="name-object" type="text" min="1" max="10" placeholder="Name of object" required="true">
                   
                   <label for="Xdimension">X dimension</label>
                   <input name="Xdimension" class="Xdimension" type="number" min="1" placeholder="Quantity of X dimension" required="true">
@@ -149,7 +149,7 @@
             <hr noshade="true">
 
             <div class="form-layout-block">
-              <button class="button-style-3" name="generate" type="submit">Generate</button>
+              <button class="button-style-3" name="generate" type="button">Generate</button>
               <button class="button-style-3" name="initialize" type="button">Initialize</button>
             </div>
 
@@ -220,11 +220,11 @@
 
               <hr noshade="true">
 
-              <div class="data-label-value outline">
+              <div class="data-label-value content-highlight3">
                 <div>Elapsed:</div>
                 <div id="realtime-data-total-duration">00:00:00</div>
               </div>
-              <div class="data-label-value outline">
+              <div class="data-label-value content-highlight3">
                 <div>Completion:</div>
                 <div id="realtime-data-total-duration">000%</div>
               </div>

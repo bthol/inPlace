@@ -230,6 +230,8 @@ function generateObject(objectDefIndex) {
         z: OD.z,
         volume: OD.volume,
     };
+
+    // add coordinates
     let coordinates = [];
     for (let x = 0; x < object.x; x++) {
         for (let y = 0; y < object.y; y++) {
@@ -239,13 +241,18 @@ function generateObject(objectDefIndex) {
         }
     }
     object.coors = coordinates;
+
+    // push to queue
     objectQueue.push(object);
 };
 
 function generateObjects() {
     // generate single instance of each object defintion
     for (let i = 0; i < objectDef.length; i++) {
-        generateObject(i);
+        // generate duplicates per quantity in object defintion
+        for (let j = 0; j < objectDef[i].quantity; j++) {
+            generateObject(i);
+        }
     }
 };
 
@@ -359,12 +366,15 @@ function validCoor(modelIndex, x, y, z) {
 };
 
 function validateSpace(modelIndex, min, max) {
-    const xRange = max[0] - min[0];
-    const yRange = max[1] - min[1];
-    const zRange = max[2] - min[2];
+    // uses validCoor to validate a given area of space
+    // partial scans use validateSpace to prevent scanning non-existent points
+    let xRange = max[0] - min[0];
+    let yRange = max[1] - min[1];
+    let zRange = max[2] - min[2];
 
     let xStart, xEnd, yStart, yEnd, zStart, zEnd;
 
+    // configure vars for validation
     if (xRange === 0) { // for no difference 
         xRange = 1;
     } else if (xRange > 0) { // for positive difference 
@@ -395,6 +405,7 @@ function validateSpace(modelIndex, min, max) {
         zEnd = min[2];
     }
 
+    // run validation
     for (let x = xStart; x < xEnd; x++) {
         for (let y = yStart; y < yEnd; y++) {
             for (let z = zStart; z< zEnd; z++) {
@@ -409,6 +420,7 @@ function validateSpace(modelIndex, min, max) {
 };
 
 function getPointIndex(modelIndex, x, y, z) {
+    // gets index of point in a model's space
     if (validCoor(modelIndex, x, y, z)) {
         // get space definition
         const defS = models[modelIndex];
@@ -500,7 +512,7 @@ function getObjectDef(objectID) {
 
 // Single Point Access 
 function spa(modelIndex, x, y, z) {
-    // returns a single point object
+    // returns a single point
     const pointIndex = getPointIndex(modelIndex, x, y, z);
     if (pointIndex !== false) {
         return models[modelIndex].space[pointIndex];
@@ -584,6 +596,7 @@ function focusScan(modelIndex, minCoor, maxCoor, test, id) {
     
 // Tests for Scanning
 function sector(point, number) {
+    // returns point property match with sector
     if (point.sector === number) {
         return true;
     } else {
@@ -592,6 +605,7 @@ function sector(point, number) {
 };
 
 function identifyObject(point, objectID) {
+    // returns point property match with object ID
     if (point.objectID === objectID) {
         return true;
     } else {
@@ -600,6 +614,7 @@ function identifyObject(point, objectID) {
 };
 
 function identifyObjectDef(point, objectDefID) {
+    // returns kind of object by object definition
     if (point.objectID.length > 0) {
         const id = point.objectID;
         let compile = "";
@@ -622,6 +637,7 @@ function identifyObjectDef(point, objectDefID) {
 };
 
 function openPoint(point, open) {
+    // returns whether point is open
     if (point.open === open) {
         return true;
     } else {
@@ -656,22 +672,17 @@ function transpose(modelIndex, objectID, x, y, z) {
 
 /////////////////// PROCESS ///////////////////
 
-defineSpaces();
-console.log(spaceDef);
+// defineSpaces();
 
-defineObjects();
-console.log(objectDef);
+// defineObjects();
 
-generateModels();
-console.log(models);
+// generateModels();
 
-generateObjects();
-console.log(objectQueue);
+// generateObjects();
 
-addObject(0, 1, 2, 1);
+// addObject(0, 1, 2, 1);
 
-console.log(getScanFull(0, identifyObjectDef, objectDef[0].objectDefID));
-
+// console.log(getScanFull(0, identifyObjectDef, objectDef[0].objectDefID));
 
 /////////////////// DISPLAY /////////////////// 
 // form component functions 
@@ -847,6 +858,80 @@ function dimensionsComponent(type) {
 };
 
 // form functions 
+function generate() {
+    // generates models from forms
+
+    // initialize data structures
+    spaceDef = [];
+    objectDef = [];
+    models = [];
+    objectQueue = [];
+
+    // generate objects
+    defineObjects();
+    generateObjects();
+
+    // generate spaces
+    defineSpaces();
+    generateModels();
+
+    console.log(spaceDef);
+    console.log(objectDef);
+    console.log(models);
+    console.log(objectQueue);
+    
+    // visualization
+    
+};
+
+function initialize() {
+    // initializes model-parameters form
+    
+    // remove object forms
+    document.body.querySelectorAll(".object-form").forEach((form) => {
+        if (form.id !== "object-form-a") {
+            form.remove();
+        }
+    });
+
+    // remove space forms
+    document.body.querySelectorAll(".space-form").forEach((form) => {
+        if (form.id !== "space-form-a") {
+            form.remove();
+        }
+    });
+
+    // remove obstructions
+    formModel.querySelector(".obstructions").innerHTML = "";
+
+    // initialize name params
+    formModel.nameObject.value = "";
+    formModel.nameSpace.value = "";
+
+    // initialize dimensions
+    document.body.querySelectorAll(".Xdimension").forEach((x) => {
+        x.value = "";
+    });
+    document.body.querySelectorAll(".Ydimension").forEach((y) => {
+        y.value = "";
+    });
+    document.body.querySelectorAll(".Zdimension").forEach((z) => {
+        z.value = "";
+    });
+
+    // initialize number type
+    formModel.querySelectorAll(".integer").forEach((option) => {
+        option.checked = false;
+    });
+
+    // initialize number of sectors
+    formModel.querySelector("#sectors-a").value = 1;
+
+    // initialize object quantity
+    formModel.quantity.value = "";
+
+};
+
 function addObstructForm(e) {
     // build a new obstruction 
     const obstruct = document.createElement('div');
@@ -1124,6 +1209,8 @@ sliderInitPercent("graph-resolution", "graph-resolution-val");
 sliderInitRatio("playback-multiplier", "playback-multiplier-val");
 
 // attach listeners to onload buttons 
+formModel.generate.addEventListener("click", generate);
+formModel.initialize.addEventListener("click", initialize);
 addObstructBTN.addEventListener("click", (e) => {addObstructForm(e)});
 addSpaceBTN.addEventListener('click', addSpaceForm);
 addObjectBTN.addEventListener('click', addObjectForm);
