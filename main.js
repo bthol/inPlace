@@ -41,7 +41,7 @@ let modelIDstructure = [0]; // modelID
 
 // unique form id and info 
 let spaceFormIDstructure = [0]; 
-let obstructFormIDstructure = [0]; 
+let obstructFormIDstructure = [0]; // for forms and obstructDef: obstructDefID
 let objectFormIDstructure = [0]; 
 
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" ];
@@ -88,6 +88,7 @@ function getID(structure) {
 // Data Structures
 let spaceDef = [];
 let objectDef = [];
+let obstructDef = [];
 let objectQueue = [];
 let models = [];
 
@@ -165,34 +166,45 @@ function defineSpace(name, x, y, z, integer = false, sectors = 1, obstruct = [])
 
 function defineSpaces() {
     // run defineSpace for every space form
-    spaceFormContainer.querySelectorAll('.space-form').forEach((form) => {
+    const forms = spaceFormContainer.querySelectorAll('.space-form');
+    for (let i = 0; i < forms.length; i++) {
         // get information from form
-        const name = form.querySelector('.name-space').value;
-        const x = form.querySelector('.Xdimension').value;
-        const y = form.querySelector('.Ydimension').value;
-        const z = form.querySelector('.Zdimension').value;
+
+        // name
+        const name = forms[i].querySelector('.name-space').value;
+
+        // dimensions
+        const x = forms[i].querySelector('.Xdimension').value;
+        const y = forms[i].querySelector('.Ydimension').value;
+        const z = forms[i].querySelector('.Zdimension').value;
+
+        // number type
         let integer;
-        form.querySelectorAll('.integer').forEach((option) => {
+        forms[i].querySelectorAll('.integer').forEach((option) => {
             if (option.checked === true) {
-                if (option.value === "true") {
+                if (option.value === 'true') {
                     integer = true;
                 } else {
                     integer = false;
                 }
             }
         });
-        let sectors = form.querySelector(`#sectors-${form.id.slice(11)}`).value;
+
+        // sectors
+        const sectors = forms[i].querySelector(`#sectors-${forms[i].id.slice(11)}`).value;
+        
         // obstructions
         let obstruct = [];
-        form.querySelectorAll('.obstruction').forEach((o) => {
+        forms[i].querySelectorAll('.obstruction').forEach((o) => {
             const x = o.querySelector('.Xdimension').value;
             const y = o.querySelector('.Ydimension').value;
             const z = o.querySelector('.Zdimension').value;
             obstruct.push([x, y, z]);
         });
+
         // pass info as arguments into defineSpaces function
         defineSpace(name, x, y, z, integer, sectors, obstruct);
-    });
+    };
 };
 
 // Defintion of Objects
@@ -217,6 +229,31 @@ function defineObjects() {
         const quantity = form.querySelector('.quantity').value;
         defineObject(name, x, y, z, quantity);
     });
+};
+
+// Defintion of Obstructions
+function defineObstruction(obstructDefID, x, y, z, spaceDefIndex) {
+    // defines obstruction for given model definition
+    let obstr = {};
+    obstr.obstructDefID = obstructDefID;
+    obstr.x = x;
+    obstr.y = y;
+    obstr.z = z;
+    obstr.spaceDefIndex = spaceDefIndex;
+    obstructDef.push(obstr);
+};
+
+function defineObstructions() {
+    // defines every obstruction for every model definition
+    const forms = formModel.querySelectorAll(".space-form");
+    for (let i = 0; i < forms.length; i++) {
+        // select all obstructions within that space form
+        const obstrs = forms[i].querySelectorAll(".obstruction");
+        for (let j = 0; j < obstrs.length; j++) {
+            // define each obstruction for that space form
+            defineObstruction(obstrs[j].id, obstrs[j].querySelector(".Xdimension").value, obstrs[j].querySelector(".Ydimension").value, obstrs[j].querySelector(".Zdimension").value, i);
+        }
+    }
 };
 
 // Object Generation
@@ -737,6 +774,7 @@ function dimensionsComponent(type) {
     
         const name = document.createElement('input');
         name.setAttribute('name', `name-space-${getID(spaceFormIDstructure)}`);
+        name.setAttribute('class', 'name-space');
         name.setAttribute('type', 'text');
         name.setAttribute('min', '1');
         name.setAttribute('max', '10');
@@ -932,28 +970,45 @@ function generate(e) {
 
     // only prevent default if valid
     // to use default form validation
-    if (modelParametersFormValid()) {
-        e.preventDefault();
-    }
+    // if (modelParametersFormValid()) {
+    //     e.preventDefault();
+    // }
+
+    e.preventDefault(); // always prevent default during development
 
     // initialize data structures
     spaceDef = [];
     objectDef = [];
+    obstructDef = [];
     models = [];
     objectQueue = [];
 
-    // generate objects
-    defineObjects();
-    generateObjects();
+    // initialize System of Identification
+    spaceDefIDstructure = [0]; // spaceDefID
+    objectDefIDstructure = [0]; // objectDefID
 
-    // generate spaces
+    objectIDstructure = [0]; // objectID
+    modelIDstructure = [0]; // modelID
+
+    // unique form id and info 
+    spaceFormIDstructure = [0]; 
+    obstructFormIDstructure = [0]; // for forms and obstructDef: obstructDefID
+    objectFormIDstructure = [0]; 
+
+    // defintion
+    defineObjects();
     defineSpaces();
-    generateModels();
+    defineObstructions();
+    
+    // generation
+    // generateObjects();
+    // generateModels();
 
     console.log(spaceDef);
     console.log(objectDef);
-    console.log(models);
-    console.log(objectQueue);
+    console.log(obstructDef);
+    // console.log(models);
+    // console.log(objectQueue);
     
     // visualization
     
@@ -1075,7 +1130,7 @@ function addSpaceForm() {
 
     // integer component 
     const integer = document.createElement('fieldset');
-    integer.setAttribute('class', 'center-flex');
+    integer.setAttribute('class', 'integer center-flex');
 
     const integerLegend = document.createElement('legend');
     integerLegend.innerText = 'Number Type';
@@ -1085,7 +1140,7 @@ function addSpaceForm() {
 
     const optionInt = document.createElement('input');
     optionInt.setAttribute('type', 'radio');
-    optionInt.setAttribute('name', 'integer');
+    optionInt.setAttribute('name', `integer-${formID}`);
     optionInt.setAttribute('class', 'integer cursor-pointer');
     optionInt.setAttribute('value', 'true');
     optionInt.setAttribute('required', true);
@@ -1095,7 +1150,7 @@ function addSpaceForm() {
 
     const optionPos = document.createElement('input');
     optionPos.setAttribute('type', 'radio');
-    optionPos.setAttribute('name', 'integer');
+    optionPos.setAttribute('name', `integer-${formID}`);
     optionPos.setAttribute('class', 'integer cursor-pointer');
     optionPos.setAttribute('value', 'false');
     optionPos.setAttribute('required', true);
@@ -1115,7 +1170,7 @@ function addSpaceForm() {
     sectorLegend.innerText = 'Sectors';
 
     const select = document.createElement('select');
-    select.setAttribute('id', `${formID}`);
+    select.setAttribute('id', `sectors-${formID}`);
 
     const option1 = document.createElement('option');
     option1.setAttribute('value', '1');
