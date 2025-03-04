@@ -41,7 +41,7 @@ let modelIDstructure = [0]; // modelID
 
 // unique form id and info 
 let spaceFormIDstructure = [0]; 
-let obstructFormIDstructure = [0]; // for forms and obstructDef: obstructDefID
+let obstructFormIDstructure = [0];
 let objectFormIDstructure = [0]; 
 
 const characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" ];
@@ -88,7 +88,6 @@ function getID(structure) {
 // Data Structures
 let spaceDef = [];
 let objectDef = [];
-let obstructDef = [];
 let objectQueue = [];
 let models = [];
 
@@ -196,10 +195,13 @@ function defineSpaces() {
         // obstructions
         let obstruct = [];
         forms[i].querySelectorAll('.obstruction').forEach((o) => {
-            const x = o.querySelector('.Xdimension').value;
-            const y = o.querySelector('.Ydimension').value;
-            const z = o.querySelector('.Zdimension').value;
-            obstruct.push([x, y, z]);
+            const xi = o.querySelector('.x-coor-i').value;
+            const xf = o.querySelector('.x-coor-f').value;
+            const yi = o.querySelector('.y-coor-i').value;
+            const yf = o.querySelector('.y-coor-f').value;
+            const zi = o.querySelector('.z-coor-i').value;
+            const zf = o.querySelector('.z-coor-f').value;
+            obstruct.push([xi, xf, yi, yf, zi, zf]);
         });
 
         // pass info as arguments into defineSpaces function
@@ -229,68 +231,6 @@ function defineObjects() {
         const quantity = form.querySelector('.quantity').value;
         defineObject(name, x, y, z, quantity);
     });
-};
-
-// Defintion of Obstructions
-function defineObstruction(obstructDefID, x, y, z, spaceDefIndex) {
-    // defines obstruction for given model definition
-    let obstr = {};
-    obstr.obstructDefID = obstructDefID;
-    obstr.x = x;
-    obstr.y = y;
-    obstr.z = z;
-    obstr.spaceDefIndex = spaceDefIndex;
-    obstructDef.push(obstr);
-};
-
-function defineObstructions() {
-    // defines every obstruction for every model definition
-    const forms = formModel.querySelectorAll(".space-form");
-    for (let i = 0; i < forms.length; i++) {
-        // select all obstructions within that space form
-        const obstrs = forms[i].querySelectorAll(".obstruction");
-        for (let j = 0; j < obstrs.length; j++) {
-            // define each obstruction for that space form
-            defineObstruction(obstrs[j].id, obstrs[j].querySelector(".Xdimension").value, obstrs[j].querySelector(".Ydimension").value, obstrs[j].querySelector(".Zdimension").value, i);
-        }
-    }
-};
-
-// Object Generation
-function generateObject(objectDefIndex) {
-    // generate object and store in queue structure
-    const OD = objectDef[objectDefIndex];
-    let object = {
-        objectID: `${OD.objectDefID}-${generateID(objectIDstructure)}`,
-        x: OD.x,
-        y: OD.y,
-        z: OD.z,
-        volume: OD.volume,
-    };
-
-    // add coordinates
-    let coordinates = [];
-    for (let x = 0; x < object.x; x++) {
-        for (let y = 0; y < object.y; y++) {
-            for (let z = 0; z < object.z; z++) {
-                coordinates.push([x, y, z]);
-            }
-        }
-    }
-    object.coors = coordinates;
-
-    // push to queue
-    objectQueue.push(object);
-};
-
-function generateObjects() {
-    // generate single instance of each object defintion
-    for (let i = 0; i < objectDef.length; i++) {
-        // generate duplicates per quantity in object defintion
-        for (let j = 0; j < objectDef[i].quantity; j++) {
-            generateObject(i);
-        }
-    }
 };
 
 // Model Generation
@@ -352,7 +292,45 @@ function generateModel(spaceDefIndex) {
 function generateModels() {
     // generate single instance of each spatial model defintion
     for (let i = 0; i < spaceDef.length; i++) {
+        // each space form
         generateModel(i);
+    }
+};
+
+// Object Generation
+function generateObject(objectDefIndex) {
+    // generate object and store in queue structure
+    const OD = objectDef[objectDefIndex];
+    let object = {
+        objectID: `${OD.objectDefID}-${generateID(objectIDstructure)}`,
+        x: OD.x,
+        y: OD.y,
+        z: OD.z,
+        volume: OD.volume,
+    };
+
+    // add coordinates
+    let coordinates = [];
+    for (let x = 0; x < object.x; x++) {
+        for (let y = 0; y < object.y; y++) {
+            for (let z = 0; z < object.z; z++) {
+                coordinates.push([x, y, z]);
+            }
+        }
+    }
+    object.coors = coordinates;
+
+    // push to queue
+    objectQueue.push(object);
+};
+
+function generateObjects() {
+    // generate single instance of each object defintion
+    for (let i = 0; i < objectDef.length; i++) {
+        // generate duplicates per quantity in object defintion
+        for (let j = 0; j < objectDef[i].quantity; j++) {
+            generateObject(i);
+        }
     }
 };
 
@@ -924,24 +902,24 @@ function modelParametersFormValid() {
         }
 
         // validate dimension fields
-        const x = form.querySelectorAll(".Xdimension");
-        const y = form.querySelectorAll(".Ydimension");
-        const z = form.querySelectorAll(".Zdimension");
+        if (form.querySelector(".Xdimension").value === "") {
+            return false;
+        }
+        if (form.querySelector(".Ydimension").value === "") {
+            return false;
+        }
+        if (form.querySelector(".Zdimension").value === "") {
+            return false;
+        }
+
+        // validate obstructions
+        const fields = form.querySelectorAll(".obstruct-coor");
         for (i in x) {
-            if (x[i].value === "") {
+            if (fields[i].value === "") {
                 return false;
             }
         }
-        for (i in y) {
-            if (y[i].value === "") {
-                return false;
-            }
-        }
-        for (i in z) {
-            if (z[i].value === "") {
-                return false;
-            }
-        }
+
     }
 
     // validate object forms
@@ -968,7 +946,7 @@ function modelParametersFormValid() {
 function generate(e) {
     // generates models from forms
 
-    // only prevent default if valid
+    // only prevent default if non-empty inputs
     // to use default form validation
     // if (modelParametersFormValid()) {
     //     e.preventDefault();
@@ -979,7 +957,6 @@ function generate(e) {
     // initialize data structures
     spaceDef = [];
     objectDef = [];
-    obstructDef = [];
     models = [];
     objectQueue = [];
 
@@ -992,23 +969,39 @@ function generate(e) {
 
     // unique form id and info 
     spaceFormIDstructure = [0]; 
-    obstructFormIDstructure = [0]; // for forms and obstructDef: obstructDefID
+    obstructFormIDstructure = [0];
     objectFormIDstructure = [0]; 
 
     // defintion
-    defineObjects();
     defineSpaces();
-    defineObstructions();
+    defineObjects();
     
     // generation
-    // generateObjects();
-    // generateModels();
+    generateModels();
+    generateObjects();
+
+    // close points by obstructions
+    for (let i = 0; i < spaceDef.length; i++) {
+        // each space form
+        const obstrs = spaceDef[i].obstruct;
+        for (let j = 0; j < obstrs.length; j++) {
+            // each obstruction for space at i
+            // close 3d area
+            for (let x = obstrs[j][0] - 1; x < obstrs[j][1]; x++) {
+                for (let y = obstrs[j][2] - 1; y < obstrs[j][3]; y++) {
+                    for (let z = obstrs[j][4] - 1; z < obstrs[j][5]; z++) {
+                        spa(i, Number(x), Number(y), Number(z)).open = false;
+                    }
+                }
+            }
+        }
+    }
 
     console.log(spaceDef);
-    console.log(objectDef);
-    console.log(obstructDef);
-    // console.log(models);
+    // console.log(objectDef);
+    console.log(models);
     // console.log(objectQueue);
+    console.log(getScanFull(0, openPoint, false));
     
     // visualization
     
@@ -1069,49 +1062,95 @@ function addObstructForm(e) {
     obstruct.setAttribute('id', `obstruct-${generateID(obstructFormIDstructure)}`);
     
     // create components 
-    const labelX = document.createElement('label');
-    labelX.setAttribute('for', 'Xdimension');
-    labelX.innerText = "X dimension";
 
-    const x = document.createElement('input');
-    x.setAttribute('name', 'Xdimension');
-    x.setAttribute('class', 'Xdimension');
-    x.setAttribute('type', 'number');
-    x.setAttribute('min', '1');
-    x.setAttribute('placeholder', "Quantity of X dimension");
-    x.setAttribute('required', true);
+    // X
+    const labelXi = document.createElement('label');
+    labelXi.setAttribute('for', 'xCoorI');
+    labelXi.innerText = "X Initial Coordinate";
 
-    const labelY = document.createElement('label');
-    labelY.setAttribute('for', 'Ydimension');
-    labelY.innerText = "Y dimension";
+    const xi = document.createElement('input');
+    xi.setAttribute('name', 'xCoorI');
+    xi.setAttribute('class', 'x-coor-i obstruct-coor');
+    xi.setAttribute('type', 'number');
+    xi.setAttribute('min', '1');
+    xi.setAttribute('placeholder', "value for coordinate");
+    xi.setAttribute('required', true);
+    
+    const labelXf = document.createElement('label');
+    labelXf.setAttribute('for', 'xCoorF');
+    labelXf.innerText = "X Final Coordinate";
 
-    const y = document.createElement('input');
-    y.setAttribute('name', 'Ydimension');
-    y.setAttribute('class', 'Ydimension');
-    y.setAttribute('type', 'number');
-    y.setAttribute('min', '1');
-    y.setAttribute('placeholder', "Quantity of Y dimension");
-    y.setAttribute('required', true);
+    const xf = document.createElement('input');
+    xf.setAttribute('name', 'xCoorF');
+    xf.setAttribute('class', 'x-coor-f obstruct-coor');
+    xf.setAttribute('type', 'number');
+    xf.setAttribute('min', '1');
+    xf.setAttribute('placeholder', "value for coordinate");
+    xf.setAttribute('required', true);
 
-    const labelZ = document.createElement('label');
-    labelZ.setAttribute('for', 'Zdimension');
-    labelZ.innerText = "Z dimension";
+    // Y
+    const labelYi = document.createElement('label');
+    labelYi.setAttribute('for', 'yCoorI');
+    labelYi.innerText = "Y Initial Coordinate";
 
-    const z = document.createElement('input');
-    z.setAttribute('name', 'Zdimension');
-    z.setAttribute('class', 'Zdimension');
-    z.setAttribute('type', 'number');
-    z.setAttribute('min', '1');
-    z.setAttribute('placeholder', "Quantity of Z dimension");
-    z.setAttribute('required', true);
+    const yi = document.createElement('input');
+    yi.setAttribute('name', 'yCoorI');
+    yi.setAttribute('class', 'y-coor-i obstruct-coor');
+    yi.setAttribute('type', 'number');
+    yi.setAttribute('min', '1');
+    yi.setAttribute('placeholder', "value for coordinate");
+    yi.setAttribute('required', true);
+    
+    const labelYf = document.createElement('label');
+    labelYf.setAttribute('for', 'yCoorF');
+    labelYf.innerText = "Y Final Coordinate";
+
+    const yf = document.createElement('input');
+    yf.setAttribute('name', 'yCoorF');
+    yf.setAttribute('class', 'y-coor-f obstruct-coor');
+    yf.setAttribute('type', 'number');
+    yf.setAttribute('min', '1');
+    yf.setAttribute('placeholder', "value for coordinate");
+    yf.setAttribute('required', true);
+
+    // Z
+    const labelZi = document.createElement('label');
+    labelZi.setAttribute('for', 'zCoorI');
+    labelZi.innerText = "Z Initial Coordinate";
+
+    const zi = document.createElement('input');
+    zi.setAttribute('name', 'zCoorI');
+    zi.setAttribute('class', 'z-coor-i obstruct-coor');
+    zi.setAttribute('type', 'number');
+    zi.setAttribute('min', '1');
+    zi.setAttribute('placeholder', "value for coordinate");
+    zi.setAttribute('required', true);
+    
+    const labelZf = document.createElement('label');
+    labelZf.setAttribute('for', 'zCoorF');
+    labelZf.innerText = "Z Final Coordinate";
+
+    const zf = document.createElement('input');
+    zf.setAttribute('name', 'zCoorF');
+    zf.setAttribute('class', 'z-coor-f obstruct-coor');
+    zf.setAttribute('type', 'number');
+    zf.setAttribute('min', '1');
+    zf.setAttribute('placeholder', "value for coordinate");
+    zf.setAttribute('required', true);
     
     // assemble components 
-    obstruct.appendChild(labelX);
-    obstruct.appendChild(x);
-    obstruct.appendChild(labelY);
-    obstruct.appendChild(y);
-    obstruct.appendChild(labelZ);
-    obstruct.appendChild(z);
+    obstruct.appendChild(labelXi);
+    obstruct.appendChild(xi);
+    obstruct.appendChild(labelXf);
+    obstruct.appendChild(xf);
+    obstruct.appendChild(labelYi);
+    obstruct.appendChild(yi);
+    obstruct.appendChild(labelYf);
+    obstruct.appendChild(yf);
+    obstruct.appendChild(labelZi);
+    obstruct.appendChild(zi);
+    obstruct.appendChild(labelZf);
+    obstruct.appendChild(zf);
     obstruct.appendChild(removeBTNComponent('remove', 'removeBTN-layout'));
 
     // append built obstruction to the space form containing the selected button 
